@@ -330,8 +330,65 @@ HTML_TEMPLATE = """
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 60px;
+            margin-bottom: 40px;
             flex-wrap: wrap;
+        }
+
+        /* Scroll-Based Velocity Component */
+        .velocity-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            padding: 16px 0;
+            margin: 24px 0 44px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        .velocity-track {
+            display: flex;
+            white-space: nowrap;
+            will-change: transform;
+            user-select: none;
+            line-height: 1.15;
+        }
+
+        .velocity-track:not(:last-child) {
+            margin-bottom: 10px;
+        }
+
+        .velocity-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            padding-right: 16px;
+            font-family: var(--font-display);
+            font-size: clamp(20px, 3.2vw, 38px);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            flex-shrink: 0;
+        }
+
+        .velocity-item .dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            background: var(--accent-gold);
+            flex-shrink: 0;
+        }
+
+        .velocity-item .highlight {
+            color: var(--accent-gold-bright);
+        }
+
+        .velocity-item .outline {
+            color: transparent;
+            -webkit-text-stroke: 1px var(--text-muted);
         }
 
         .metrics-grid-flat {
@@ -958,6 +1015,86 @@ HTML_TEMPLATE = """
                 <a href="#screening" class="btn-sharp btn-sharp-primary">Launch Screening Studio</a>
                 <button onclick="selectSample('sample_06_moderate_dr.png')" class="btn-sharp">Load Benchmark Sample</button>
                 <button onclick="openPitchModal(2)" class="btn-sharp">Technical Methodology</button>
+            </div>
+
+            <!-- Scroll-Based Velocity Marquee Banner -->
+            <div class="velocity-container" id="velocitySection">
+                <div class="velocity-track" id="velocityTrack1">
+                    <span class="velocity-item">
+                        <span>OPTINOVA AI</span> <span class="dot"></span>
+                        <span class="highlight">EXPLAINABLE AI SCREENING</span> <span class="dot"></span>
+                        <span class="outline">SPATIAL IoU ≥ 0.45</span> <span class="dot"></span>
+                        <span>EDGE DSP QC &lt;40MS</span> <span class="dot"></span>
+                        <span class="highlight">ICDR 5-TIER GRADING</span> <span class="dot"></span>
+                        <span class="outline">ZERO-CAPEX TELEMEDICINE</span> <span class="dot"></span>
+                        <span>SIH26038</span> <span class="dot"></span>
+                    </span>
+                    <span class="velocity-item">
+                        <span>OPTINOVA AI</span> <span class="dot"></span>
+                        <span class="highlight">EXPLAINABLE AI SCREENING</span> <span class="dot"></span>
+                        <span class="outline">SPATIAL IoU ≥ 0.45</span> <span class="dot"></span>
+                        <span>EDGE DSP QC &lt;40MS</span> <span class="dot"></span>
+                        <span class="highlight">ICDR 5-TIER GRADING</span> <span class="dot"></span>
+                        <span class="outline">ZERO-CAPEX TELEMEDICINE</span> <span class="dot"></span>
+                        <span>SIH26038</span> <span class="dot"></span>
+                    </span>
+                    <span class="velocity-item">
+                        <span>OPTINOVA AI</span> <span class="dot"></span>
+                        <span class="highlight">EXPLAINABLE AI SCREENING</span> <span class="dot"></span>
+                        <span class="outline">SPATIAL IoU ≥ 0.45</span> <span class="dot"></span>
+                        <span>EDGE DSP QC &lt;40MS</span> <span class="dot"></span>
+                        <span class="highlight">ICDR 5-TIER GRADING</span> <span class="dot"></span>
+                        <span class="outline">ZERO-CAPEX TELEMEDICINE</span> <span class="dot"></span>
+                        <span>SIH26038</span> <span class="dot"></span>
+                    </span>
+                    <span class="velocity-item">
+                        <span>OPTINOVA AI</span> <span class="dot"></span>
+                        <span class="highlight">EXPLAINABLE AI SCREENING</span> <span class="dot"></span>
+                        <span class="outline">SPATIAL IoU ≥ 0.45</span> <span class="dot"></span>
+                        <span>EDGE DSP QC &lt;40MS</span> <span class="dot"></span>
+                        <span class="highlight">ICDR 5-TIER GRADING</span> <span class="dot"></span>
+                        <span class="outline">ZERO-CAPEX TELEMEDICINE</span> <span class="dot"></span>
+                        <span>SIH26038</span> <span class="dot"></span>
+                    </span>
+                </div>
+                <div class="velocity-track" id="velocityTrack2">
+                    <span class="velocity-item">
+                        <span class="outline">LAPLACIAN FOCUS GATING</span> <span class="dot"></span>
+                        <span>CIELAB CLAHE NORMALIZATION</span> <span class="dot"></span>
+                        <span class="highlight">MULTI-LESION SEGMENTATION</span> <span class="dot"></span>
+                        <span class="outline">1:1 PROVENANCE LOCK</span> <span class="dot"></span>
+                        <span>MULTI-SPECTRAL ADJUDICATION</span> <span class="dot"></span>
+                        <span class="highlight">&gt;90% SENSITIVITY</span> <span class="dot"></span>
+                        <span>SMART INDIA HACKATHON 2026</span> <span class="dot"></span>
+                    </span>
+                    <span class="velocity-item">
+                        <span class="outline">LAPLACIAN FOCUS GATING</span> <span class="dot"></span>
+                        <span>CIELAB CLAHE NORMALIZATION</span> <span class="dot"></span>
+                        <span class="highlight">MULTI-LESION SEGMENTATION</span> <span class="dot"></span>
+                        <span class="outline">1:1 PROVENANCE LOCK</span> <span class="dot"></span>
+                        <span>MULTI-SPECTRAL ADJUDICATION</span> <span class="dot"></span>
+                        <span class="highlight">&gt;90% SENSITIVITY</span> <span class="dot"></span>
+                        <span>SMART INDIA HACKATHON 2026</span> <span class="dot"></span>
+                    </span>
+                    <span class="velocity-item">
+                        <span class="outline">LAPLACIAN FOCUS GATING</span> <span class="dot"></span>
+                        <span>CIELAB CLAHE NORMALIZATION</span> <span class="dot"></span>
+                        <span class="highlight">MULTI-LESION SEGMENTATION</span> <span class="dot"></span>
+                        <span class="outline">1:1 PROVENANCE LOCK</span> <span class="dot"></span>
+                        <span>MULTI-SPECTRAL ADJUDICATION</span> <span class="dot"></span>
+                        <span class="highlight">&gt;90% SENSITIVITY</span> <span class="dot"></span>
+                        <span>SMART INDIA HACKATHON 2026</span> <span class="dot"></span>
+                    </span>
+                    <span class="velocity-item">
+                        <span class="outline">LAPLACIAN FOCUS GATING</span> <span class="dot"></span>
+                        <span>CIELAB CLAHE NORMALIZATION</span> <span class="dot"></span>
+                        <span class="highlight">MULTI-LESION SEGMENTATION</span> <span class="dot"></span>
+                        <span class="outline">1:1 PROVENANCE LOCK</span> <span class="dot"></span>
+                        <span>MULTI-SPECTRAL ADJUDICATION</span> <span class="dot"></span>
+                        <span class="highlight">&gt;90% SENSITIVITY</span> <span class="dot"></span>
+                        <span>SMART INDIA HACKATHON 2026</span> <span class="dot"></span>
+                    </span>
+                </div>
             </div>
 
             <!-- Telemetry Metrics Bar -->
@@ -2019,6 +2156,70 @@ HTML_TEMPLATE = """
             toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
+
+        // Scroll-Based Velocity Engine (@componentry/scroll-based-velocity)
+        (function initScrollBasedVelocity() {
+            const track1 = document.getElementById('velocityTrack1');
+            const track2 = document.getElementById('velocityTrack2');
+            if (!track1 || !track2) return;
+
+            let baseVelocity1 = -1.2; // default leftward px/frame
+            let baseVelocity2 = 1.2;  // default rightward px/frame
+            
+            let pos1 = 0;
+            let pos2 = 0;
+            
+            let scrollVelocity = 0;
+            let lastScrollY = window.scrollY;
+            let lastTime = performance.now();
+
+            window.addEventListener('scroll', () => {
+                const now = performance.now();
+                const deltaT = Math.max(1, now - lastTime);
+                const currentY = window.scrollY;
+                const deltaY = currentY - lastScrollY;
+                
+                // Calculate scroll impulse velocity
+                const instantVelocity = (deltaY / deltaT) * 16;
+                scrollVelocity += instantVelocity;
+                
+                // Clamp max acceleration
+                scrollVelocity = Math.max(-30, Math.min(30, scrollVelocity));
+
+                lastScrollY = currentY;
+                lastTime = now;
+            }, { passive: true });
+
+            function animateVelocity() {
+                // Smooth friction damping back to base speed
+                scrollVelocity *= 0.93;
+
+                // Modulate speed by scroll velocity
+                const speed1 = baseVelocity1 - scrollVelocity * 0.65;
+                const speed2 = baseVelocity2 + scrollVelocity * 0.65;
+
+                pos1 += speed1;
+                pos2 += speed2;
+
+                const firstChild1 = track1.firstElementChild;
+                const firstChild2 = track2.firstElementChild;
+                const itemWidth1 = firstChild1 ? firstChild1.offsetWidth : 1200;
+                const itemWidth2 = firstChild2 ? firstChild2.offsetWidth : 1200;
+
+                if (pos1 <= -itemWidth1) pos1 += itemWidth1;
+                if (pos1 > 0) pos1 -= itemWidth1;
+
+                if (pos2 >= 0) pos2 -= itemWidth2;
+                if (pos2 < -itemWidth2) pos2 += itemWidth2;
+
+                track1.style.transform = `translate3d(${pos1}px, 0, 0)`;
+                track2.style.transform = `translate3d(${pos2}px, 0, 0)`;
+
+                requestAnimationFrame(animateVelocity);
+            }
+
+            requestAnimationFrame(animateVelocity);
+        })();
     </script>
 </body>
 </html>
