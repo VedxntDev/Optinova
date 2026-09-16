@@ -177,6 +177,69 @@ HTML_TEMPLATE = """
             color: var(--text-primary);
         }
 
+        /* Framer Eye Follow Component (https://framer.com/m/Eye-Follow-Button-yMBK.js@UiZdcXLPs68fBczUfQ27) */
+        .eye-follow-widget {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            position: relative;
+            user-select: none;
+            pointer-events: none;
+            vertical-align: middle;
+        }
+
+        .eye-follow-socket {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+            flex-shrink: 0;
+        }
+
+        .eye-follow-iris {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-gold-bright) 25%, var(--accent-gold) 65%, #78350f 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            will-change: transform;
+        }
+
+        .eye-follow-pupil {
+            width: 5.5px;
+            height: 5.5px;
+            border-radius: 50%;
+            background: #000000;
+            position: relative;
+        }
+
+        .eye-follow-pupil::after {
+            content: '';
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            width: 1.5px;
+            height: 1.5px;
+            border-radius: 50%;
+            background: #ffffff;
+        }
+
+        .eye-follow-socket.blinking {
+            transform: scaleY(0.08) !important;
+        }
+
         .nav-brand-mark {
             width: 32px;
             height: 32px;
@@ -188,23 +251,24 @@ HTML_TEMPLATE = """
             justify-content: center;
             flex-shrink: 0;
             transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        .nav-brand-mark .eye-follow-socket {
+            width: 22px;
+            height: 22px;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .nav-brand-mark .eye-follow-iris {
+            width: 13px;
+            height: 13px;
         }
 
         .nav-brand:hover .nav-brand-mark {
             border-color: var(--accent-gold);
             background: var(--bg-surface);
-            color: var(--accent-gold-bright);
-        }
-
-        .nav-brand-mark svg {
-            display: block;
-            color: var(--text-primary);
-            transition: color 0.2s ease, transform 0.2s ease;
-        }
-
-        .nav-brand:hover .nav-brand-mark svg {
-            color: var(--accent-gold-bright);
-            transform: scale(1.08);
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
         }
 
         .nav-brand-text {
@@ -1536,11 +1600,13 @@ HTML_TEMPLATE = """
     <nav class="no-print">
         <a href="#" class="nav-brand">
             <div class="nav-brand-mark">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="12" cy="12" r="3.6" fill="var(--accent-gold)" stroke="currentColor" stroke-width="1.4"/>
-                    <circle cx="13.2" cy="10.8" r="1.1" fill="#ffffff"/>
-                </svg>
+                <div class="eye-follow-widget" data-eye-count="one" data-range="85" data-eye-size="22">
+                    <div class="eye-follow-socket">
+                        <div class="eye-follow-iris">
+                            <div class="eye-follow-pupil"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="nav-brand-text">
                 OPTINOVA <span class="nav-brand-sub">SIH26038</span>
@@ -1788,8 +1854,20 @@ HTML_TEMPLATE = """
 
                     <div id="fileSelectionText" style="font-family:var(--font-mono); font-size:11px; color:var(--accent-gold); margin-bottom:12px;"></div>
 
-                    <button class="btn-sharp btn-sharp-accent" id="btnRun" style="width:100%; justify-content:center;" onclick="runScreening()" disabled>
-                        Execute AI Pipeline
+                    <button class="btn-sharp btn-sharp-accent" id="btnRun" style="width:100%; justify-content:center; gap:10px; padding:10px 16px;" onclick="runScreening()" disabled>
+                        <div class="eye-follow-widget" data-eye-count="two" data-range="85" data-eye-size="18">
+                            <div class="eye-follow-socket" style="width:18px; height:18px;">
+                                <div class="eye-follow-iris" style="width:10px; height:10px;">
+                                    <div class="eye-follow-pupil" style="width:5px; height:5px;"></div>
+                                </div>
+                            </div>
+                            <div class="eye-follow-socket" style="width:18px; height:18px;">
+                                <div class="eye-follow-iris" style="width:10px; height:10px;">
+                                    <div class="eye-follow-pupil" style="width:5px; height:5px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span>Execute AI Pipeline</span>
                     </button>
 
                     <!-- ICDR 5-Tier Disease Severity Grading -->
@@ -1892,7 +1970,21 @@ HTML_TEMPLATE = """
                                 <div style="position:absolute; top:8px; left:8px; font-family:var(--font-mono); font-size:10px; background:rgba(0,0,0,0.75); color:var(--accent-gold); padding:2px 6px; border:1px solid var(--border-color);">FEED: STAGED</div>
                             </div>
                             <div style="font-family:var(--font-mono); font-size:12px; color:var(--text-primary);" id="emptyPreviewLabel">Fundus Image Staged</div>
-                            <button class="btn-sharp btn-sharp-primary" onclick="runScreening()">⚡ Execute AI Pipeline Now</button>
+                            <button class="btn-sharp btn-sharp-primary" style="gap:10px;" onclick="runScreening()">
+                                <div class="eye-follow-widget" data-eye-count="two" data-range="85" data-eye-size="18">
+                                    <div class="eye-follow-socket" style="width:18px; height:18px;">
+                                        <div class="eye-follow-iris" style="width:10px; height:10px;">
+                                            <div class="eye-follow-pupil" style="width:5px; height:5px;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="eye-follow-socket" style="width:18px; height:18px;">
+                                        <div class="eye-follow-iris" style="width:10px; height:10px;">
+                                            <div class="eye-follow-pupil" style="width:5px; height:5px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span>Execute AI Pipeline Now</span>
+                            </button>
                         </div>
                     </div>
 
@@ -3341,6 +3433,76 @@ HTML_TEMPLATE = """
             window.addEventListener('resize', updateScrollProgress, { passive: true });
             updateScrollProgress();
             requestAnimationFrame(animateReveal);
+        })();
+
+        // Framer Eye Follow Engine (https://framer.com/m/Eye-Follow-Button-yMBK.js@UiZdcXLPs68fBczUfQ27)
+        (function initFramerEyeFollow() {
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            }, { passive: true });
+
+            // Periodic natural eye blinking
+            function triggerBlink() {
+                const sockets = document.querySelectorAll('.eye-follow-socket');
+                sockets.forEach(socket => socket.classList.add('blinking'));
+                setTimeout(() => {
+                    sockets.forEach(socket => socket.classList.remove('blinking'));
+                    setTimeout(triggerBlink, 2600 + Math.random() * 2400);
+                }, 150);
+            }
+            setTimeout(triggerBlink, 2000);
+
+            function updateEyes() {
+                const widgets = document.querySelectorAll('.eye-follow-widget');
+                widgets.forEach(widget => {
+                    const sockets = widget.querySelectorAll('.eye-follow-socket');
+                    const eyeSize = parseFloat(widget.dataset.eyeSize) || 20;
+                    const pupilSize = eyeSize * 0.55;
+                    const trackingRange = parseFloat(widget.dataset.range) || 85;
+                    const maxDistance = ((eyeSize - pupilSize) / 2) * (trackingRange / 100);
+
+                    sockets.forEach(socket => {
+                        const iris = socket.querySelector('.eye-follow-iris');
+                        if (!iris) return;
+
+                        const rect = socket.getBoundingClientRect();
+                        if (rect.width === 0 || rect.height === 0) return;
+
+                        const centerX = rect.left + rect.width / 2;
+                        const centerY = rect.top + rect.height / 2;
+
+                        const dx = mouseX - centerX;
+                        const dy = mouseY - centerY;
+                        const dist = Math.hypot(dx, dy);
+
+                        let targetX = 0, targetY = 0;
+                        if (dist > 0) {
+                            const clamped = Math.min(dist, maxDistance);
+                            const angle = Math.atan2(dy, dx);
+                            targetX = Math.cos(angle) * clamped;
+                            targetY = Math.sin(angle) * clamped;
+                        }
+
+                        let curX = parseFloat(iris.dataset.curX || 0);
+                        let curY = parseFloat(iris.dataset.curY || 0);
+
+                        curX += (targetX - curX) * 0.20;
+                        curY += (targetY - curY) * 0.20;
+
+                        iris.dataset.curX = curX;
+                        iris.dataset.curY = curY;
+                        iris.style.transform = `translate3d(${curX.toFixed(2)}px, ${curY.toFixed(2)}px, 0)`;
+                    });
+                });
+
+                requestAnimationFrame(updateEyes);
+            }
+
+            requestAnimationFrame(updateEyes);
         })();
     </script>
 </body>
