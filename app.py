@@ -3102,19 +3102,28 @@ HTML_TEMPLATE = """
                 </div>
 
                 <!-- Diagnosis Summary Box -->
-                <div style="border:2px solid #000000; padding:14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; background:#f9fafb;">
+                <div style="border:2px solid #000000; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; background:#f9fafb;">
                     <div>
-                        <div style="font-size:10px; font-family:var(--font-mono); font-weight:700; color:#6b7280; text-transform:uppercase;">ICDR Disease Severity Classification</div>
-                        <div style="font-family:var(--font-display); font-size:19px; font-weight:800; text-transform:uppercase; color:#111827; margin-top:2px;" id="rptGradeName">
-                            Grade 2: Moderate Non-Proliferative DR
+                        <div style="font-size:10px; font-family:var(--font-mono); font-weight:700; color:#6b7280; text-transform:uppercase;">AI-Assisted ICDR Screening Classification</div>
+                        <div style="font-family:var(--font-display); font-size:18px; font-weight:800; text-transform:uppercase; color:#111827; margin-top:2px;" id="rptGradeName">
+                            Suspected Proliferative Diabetic Retinopathy (ICDR Level 4)
                         </div>
                         <div style="font-size:11px; color:#4b5563; margin-top:2px;">
-                            Calibrated Confidence: <strong id="rptConf">91.4%</strong> • Triage Criteria: <strong id="rptCutoff">Grade ≥ 2 (Referable)</strong>
+                            AI Confidence: <strong id="rptConf">97.8%</strong> • Triage Criteria: <strong id="rptCutoff">Grade 4 / NV-Positive (Urgent Referable)</strong>
+                        </div>
+                        <div style="font-size:11px; font-weight:700; color:#b91c1c; margin-top:4px;" id="rptGradeSub">
+                            Neovascularization detected • Urgent ophthalmology referral recommended
                         </div>
                     </div>
-                    <div style="border:2px solid #000000; padding:8px 14px; font-family:var(--font-mono); font-size:12px; font-weight:800; text-transform:uppercase; background:#ffffff;" id="rptBadge">
-                        REFERRAL REQUIRED
+                    <div style="border:2px solid #000000; padding:8px 14px; font-family:var(--font-mono); font-size:12px; font-weight:800; text-transform:uppercase; background:#ffffff; white-space:nowrap;" id="rptBadge">
+                        URGENT REFERRAL
                     </div>
+                </div>
+
+                <!-- AI Screening Disclaimer -->
+                <div style="background:#fef2f2; border:1px solid #fecaca; padding:8px 12px; margin-bottom:14px; font-size:10.5px; color:#991b1b; display:flex; align-items:center; gap:8px;">
+                    <span style="font-weight:700; text-transform:uppercase; white-space:nowrap;">⚠️ AI SCREENING DISCLAIMER:</span>
+                    <span>AI-assisted screening result — not a definitive clinical diagnosis. Ophthalmologist confirmation is required before treatment decisions.</span>
                 </div>
 
                 <!-- 4 High-Res Evidence Quad -->
@@ -3153,48 +3162,51 @@ HTML_TEMPLATE = """
                     <tbody>
                         <tr>
                             <td><strong>Microaneurysms (MAs)</strong></td>
-                            <td id="rptValMAs">4</td>
-                            <td>0</td>
+                            <td id="rptValMAs">82</td>
+                            <td>Absent in normal retina</td>
                             <td>Hallmark of retinal capillary dilation</td>
                         </tr>
                         <tr>
                             <td><strong>Hard Lipid Exudates</strong></td>
-                            <td id="rptValExudates">2</td>
-                            <td>0</td>
+                            <td id="rptValExudates">67</td>
+                            <td>Absent in normal retina</td>
                             <td>Lipoprotein leakage; indicates Macular Edema risk</td>
                         </tr>
                         <tr>
                             <td><strong>Retinal Hemorrhages</strong></td>
-                            <td id="rptValHems">3</td>
-                            <td>0</td>
+                            <td id="rptValHems">0</td>
+                            <td>Absent in normal retina</td>
                             <td>Dot/blot and flame hemorrhages</td>
                         </tr>
                         <tr>
                             <td><strong>Laplacian Sharpness (Focus τ)</strong></td>
-                            <td id="rptValFocus">84.2</td>
+                            <td id="rptValFocus">116.4</td>
                             <td>&ge; 40.0</td>
                             <td>Edge DSP focus quality threshold</td>
                         </tr>
                         <tr>
-                            <td><strong>Grad-CAM Spatial IoU (τ &ge; 0.45)</strong></td>
-                            <td id="rptValIoU">0.52</td>
-                            <td>&ge; 0.45</td>
-                            <td>Co-localization of neural activation with lesions</td>
+                            <td><strong>Grad-CAM Spatial IoU</strong></td>
+                            <td id="rptValIoU">0.59</td>
+                            <td>Project threshold &ge; 0.45</td>
+                            <td>Grad-CAM activation demonstrates spatial overlap with detected lesion regions</td>
                         </tr>
                         <tr>
-                            <td><strong>Pearson Spatial Correlation (τ &ge; 0.50)</strong></td>
-                            <td id="rptValPearson">0.65</td>
-                            <td>&ge; 0.50</td>
+                            <td><strong>Pearson Spatial Correlation</strong></td>
+                            <td id="rptValPearson">0.85</td>
+                            <td>Project threshold &ge; 0.50</td>
                             <td>Spatial gradient correlation across retina</td>
                         </tr>
                         <tr>
                             <td><strong>Neovascularization (NV)</strong></td>
-                            <td id="rptValNV">None</td>
-                            <td>None</td>
-                            <td>Proliferative DR (NVD/NVE) urgent marker</td>
+                            <td id="rptValNV">Detected by AI</td>
+                            <td>Absent</td>
+                            <td>AI-detected neovascularization — requires ophthalmologist confirmation</td>
                         </tr>
                     </tbody>
                 </table>
+                <div style="font-size:9.5px; color:#6b7280; margin-top:3px; margin-bottom:12px; font-style:italic;">
+                    * Note: These metrics evaluate explainability/lesion localization alignment and do not independently establish clinical diagnosis.
+                </div>
 
                 <!-- Clinical Rationale Pathway -->
                 <div style="border:1px solid #d1d5db; padding:10px 12px; margin-bottom:14px; background:#fafafa;">
@@ -3204,28 +3216,31 @@ HTML_TEMPLATE = """
                     <div id="rptRationale" style="font-family:var(--font-mono); font-size:11px; color:#1f2937; line-height:1.5; white-space:pre-wrap;"></div>
                 </div>
 
-                <!-- Physician Sign-Off & Review Governance -->
+                <!-- Physician Review & Governance -->
                 <div style="border-top:1px solid #9ca3af; padding-top:12px; display:grid; grid-template-columns:1.5fr 1fr; gap:20px; font-size:11px;">
                     <div>
-                        <div style="font-weight:700; margin-bottom:4px;">PHYSICIAN ADJUDICATION & GOVERNANCE:</div>
-                        <div style="display:flex; flex-direction:column; gap:4px; color:#374151;">
-                            <label><input type="checkbox" id="chkStage1" onchange="checkAdjudicationReadiness()"> Stage 1 & 2: Focus & CLAHE Illumination Verified</label>
-                            <label><input type="checkbox" id="chkStage2" onchange="checkAdjudicationReadiness()"> Stage 3: Anatomical OD, Fovea & Biomarker Segmentations Validated</label>
-                            <label><input type="checkbox" id="chkStage3" onchange="checkAdjudicationReadiness()"> Stage 4: Grad-CAM Activation Co-localization (IoU &ge; 0.45, Pearson &ge; 0.50) Confirmed</label>
+                        <div style="font-weight:700; margin-bottom:2px; text-transform:uppercase;">PHYSICIAN REVIEW &amp; GOVERNANCE:</div>
+                        <div style="font-size:10px; color:#b45309; font-weight:700; margin-bottom:6px;">
+                            STATUS: AWAITING PHYSICIAN REVIEW • AI result requires review by a qualified ophthalmologist before clinical authorization.
                         </div>
-                        <div id="adjudicationAuditLog" style="margin-top:6px; font-family:var(--font-mono); font-size:10px; color:#059669; font-weight:700;">
-                            ✓ Review Active • Compliance: 30s Multi-Spectral Gating Enforced
+                        <div style="display:flex; flex-direction:column; gap:4px; color:#374151;">
+                            <label><input type="checkbox" id="chkStage1" onchange="checkAdjudicationReadiness()"> Stage 1 &amp; 2: Focus &amp; CLAHE Illumination Verified</label>
+                            <label><input type="checkbox" id="chkStage2" onchange="checkAdjudicationReadiness()"> Stage 3: Anatomical OD, Fovea &amp; Biomarker Segmentations Validated</label>
+                            <label><input type="checkbox" id="chkStage3" onchange="checkAdjudicationReadiness()"> Stage 4: Grad-CAM Activation Co-localization Verified (IoU &ge; 0.45 • Pearson &ge; 0.50)</label>
+                        </div>
+                        <div id="adjudicationAuditLog" style="margin-top:6px; font-family:var(--font-mono); font-size:10px; color:#b45309; font-weight:700;">
+                            ⏳ Review Active • Compliance: 30s Multi-Spectral Inspection Required
                         </div>
                     </div>
                     <div style="text-align:right; font-family:var(--font-mono);">
-                        <div style="border-bottom:1px solid #000000; height:28px; margin-bottom:4px; display:flex; align-items:flex-end; justify-content:flex-end; font-family:cursive; font-size:14px;" id="doctorSigText">
-                            Dr. Rajesh Sharma, MD
+                        <div><strong>EXAMINING OPHTHALMOLOGIST</strong></div>
+                        <div style="border-bottom:1px dashed #9ca3af; height:28px; margin-bottom:4px; display:flex; align-items:center; justify-content:flex-end; font-family:var(--font-mono); font-size:10px; color:#6b7280; letter-spacing:0.03em;" id="doctorSigText">
+                            [ PENDING PHYSICIAN AUTHORIZATION ]
                         </div>
-                        <div><strong>EXAMINING OPHTHALMOLOGIST SIGNATURE</strong></div>
-                        <div style="font-size:10px; color:#4b5563;">Reg No: MED-IN-2026-90412</div>
-                        <div style="font-size:9px; color:#6b7280; margin-top:2px;" id="rptSignedTimestamp">Pending 30s Adjudication...</div>
+                        <div style="font-size:10px; color:#4b5563;">Status: Not yet authorized • Awaiting physician review</div>
+                        <div style="font-size:9px; color:#6b7280; margin-top:2px;" id="rptSignedTimestamp">30s Inspection Stopwatch Active...</div>
                         <button id="btnSignOff" class="btn-sharp" style="margin-top:8px; font-size:10px; padding:4px 12px; background:#111827; color:#ffffff; border:1px solid #374151; cursor:pointer;" onclick="submitDoctorSignOff()" disabled>
-                            Authorize & Sign Report
+                            Authorize &amp; Sign Report
                         </button>
                     </div>
                 </div>
@@ -3975,9 +3990,37 @@ HTML_TEMPLATE = """
             );
             document.getElementById('rptCutoff').innerText = cutoffText;
 
+            // Subline underneath diagnosis
+            const subEl = document.getElementById('rptGradeSub');
+            if (subEl) {
+                if (lastScreenData.status === 'reject') {
+                    subEl.innerText = "Scan rejected by quality gatekeeper • Adjust focus/flash and recapture";
+                    subEl.style.color = "#b91c1c";
+                } else if (lastScreenData.grade_level >= 4 || lastScreenData.stats.nv_flag) {
+                    subEl.innerText = "Neovascularization detected • Urgent ophthalmology referral recommended";
+                    subEl.style.color = "#b91c1c";
+                } else if (lastScreenData.grade_level === 3) {
+                    subEl.innerText = "Severe diabetic retinopathy detected • High-risk ophthalmology referral recommended";
+                    subEl.style.color = "#b91c1c";
+                } else if (lastScreenData.grade_level === 2) {
+                    subEl.innerText = "Referable diabetic retinopathy detected • Ophthalmology consultation recommended";
+                    subEl.style.color = "#b45309";
+                } else if (lastScreenData.grade_level === 1) {
+                    subEl.innerText = "Microaneurysms detected • 6–12 month monitoring recommended";
+                    subEl.style.color = "#b45309";
+                } else {
+                    subEl.innerText = "No significant diabetic retinopathy lesions detected • Routine screening recommended";
+                    subEl.style.color = "#047857";
+                }
+            }
+
             const badge = document.getElementById('rptBadge');
             if (lastScreenData.status === 'reject') {
                 badge.innerText = "GATEKEEPER REJECTED";
+                badge.style.color = "#b91c1c";
+                badge.style.borderColor = "#b91c1c";
+            } else if (lastScreenData.grade_level >= 4 || lastScreenData.stats.nv_flag) {
+                badge.innerText = "URGENT REFERRAL";
                 badge.style.color = "#b91c1c";
                 badge.style.borderColor = "#b91c1c";
             } else if (lastScreenData.is_xai_gated) {
@@ -3988,8 +4031,12 @@ HTML_TEMPLATE = """
                 badge.innerText = "REFERRAL REQUIRED";
                 badge.style.color = "#b45309";
                 badge.style.borderColor = "#b45309";
+            } else if (lastScreenData.grade_level === 1) {
+                badge.innerText = "MONITOR 6-12M";
+                badge.style.color = "#b45309";
+                badge.style.borderColor = "#b45309";
             } else {
-                badge.innerText = "ROUTINE / CLEAR";
+                badge.innerText = "ROUTINE SCREENING";
                 badge.style.color = "#047857";
                 badge.style.borderColor = "#047857";
             }
@@ -4009,7 +4056,7 @@ HTML_TEMPLATE = """
             const pearsonVal = typeof lastScreenData.pearson_corr === 'number' ? lastScreenData.pearson_corr : 0.65;
             document.getElementById('rptValIoU').innerText = iouVal.toFixed(2);
             document.getElementById('rptValPearson').innerText = pearsonVal.toFixed(2);
-            document.getElementById('rptValNV').innerText = lastScreenData.stats.nv_flag ? "YES (Active Neovascularization)" : "None";
+            document.getElementById('rptValNV').innerText = lastScreenData.stats.nv_flag ? "Detected by AI" : "None detected";
 
             document.getElementById('rptRationale').innerText = lastScreenData.rationale;
 
@@ -4021,9 +4068,21 @@ HTML_TEMPLATE = """
             const stage4Passed = (!lastScreenData.is_xai_gated && iouVal >= 0.45 && pearsonVal >= 0.50);
             document.getElementById('chkStage3').checked = stage4Passed;
 
-            document.getElementById('rptSignedTimestamp').innerText = "Pending 30s Multi-Spectral Adjudication...";
+            const sigTextEl = document.getElementById('doctorSigText');
+            if (sigTextEl) {
+                sigTextEl.style.fontFamily = "var(--font-mono)";
+                sigTextEl.style.fontSize = "10px";
+                sigTextEl.style.color = "#6b7280";
+                sigTextEl.innerText = "[ PENDING PHYSICIAN AUTHORIZATION ]";
+            }
+
+            document.getElementById('rptSignedTimestamp').innerText = "30s Inspection Stopwatch Active...";
             document.getElementById('rptSignedTimestamp').style.color = "#6b7280";
-            document.getElementById('btnSignOff').disabled = true;
+            const signBtn = document.getElementById('btnSignOff');
+            if (signBtn) {
+                signBtn.disabled = true;
+                signBtn.innerText = "Authorize & Sign Report";
+            }
 
             // Start 30-Second Review Stopwatch
             reviewStartTime = Date.now();
@@ -4051,7 +4110,7 @@ HTML_TEMPLATE = """
                 timerEl.style.background = "#fef3c7";
                 timerEl.style.color = "#92400e";
                 timerEl.innerText = `⏱️ REVIEW ACTIVE: ${mm}:${ss}s (Lock: ${remain}s remaining)`;
-                auditLog.style.color = "#d97706";
+                auditLog.style.color = "#b45309";
                 auditLog.innerText = `⏳ Active Inspection Required (${remain}s remaining before authorization can unlock)`;
                 document.getElementById('btnSignOff').disabled = true;
             } else {
@@ -4105,6 +4164,15 @@ HTML_TEMPLATE = """
             .then(data => {
                 const auditLog = document.getElementById('adjudicationAuditLog');
                 const sigStamp = document.getElementById('rptSignedTimestamp');
+                const sigTextEl = document.getElementById('doctorSigText');
+
+                if (sigTextEl) {
+                    sigTextEl.style.fontFamily = "cursive";
+                    sigTextEl.style.fontSize = "15px";
+                    sigTextEl.style.color = "#111827";
+                    sigTextEl.innerText = data.doctor_name || "Dr. Rajesh Sharma, MD";
+                }
+
                 auditLog.style.color = "#059669";
                 auditLog.innerText = `✓ Authorized & Sealed (${data.elapsed_seconds}s inspection verified)`;
                 sigStamp.innerText = `Authorized: ${data.signed_timestamp} [SEAL: ${data.digital_signature.substring(0, 16)}...]`;

@@ -110,21 +110,31 @@ def explain_prediction(img, severity_level, referable_flag, confidence, lesion_s
         gating_memo = f"\n⚠️ [XAI CO-LOCALIZATION ALERT]: {' and '.join(failed_items)} did not reach verification benchmark."
         if passed_items:
             gating_memo += f" [PASSED: {' and '.join(passed_items)}]."
-        gating_memo += f"\n   • Confidence Downgrade: {raw_confidence*100:.1f}% → {calibrated_confidence*100:.1f}% via [{downgrade_penalty_formula}]."
+        gating_memo += f"\n   • Confidence Calibration: {raw_confidence*100:.1f}% → {calibrated_confidence*100:.1f}% via [{downgrade_penalty_formula}]."
         gating_memo += f"\n   • Adjudication Action: Case flagged for mandatory physician review before clinical sign-off."
+        gating_memo += f"\n   • Note: These metrics evaluate explainability/lesion localization alignment and do not independently establish clinical diagnosis."
     else:
         downgrade_penalty_formula = "None (Verification Passed)"
         calibrated_confidence = float(raw_confidence)
-        gating_memo = f"\n✅ [XAI VERIFICATION PASSED]: Spatial IoU ({spatial_iou:.2f} >= {iou_threshold:.2f}) and Pearson correlation ({p_corr:.2f} >= {pearson_threshold:.2f}) confirm high spatial alignment with segmented lesions."
+        gating_memo = f"\n✅ [XAI VERIFICATION PASSED]: Grad-CAM activation demonstrates spatial overlap with detected lesion regions."
+        gating_memo += f"\n   • Spatial IoU: {spatial_iou:.2f} (project threshold >= {iou_threshold:.2f})"
+        gating_memo += f"\n   • Pearson correlation: {p_corr:.2f} (project threshold >= {pearson_threshold:.2f})"
+        gating_memo += f"\n   • Note: These metrics evaluate explainability/lesion localization alignment and do not independently establish clinical diagnosis."
 
     # 5. Programmatic ICDR Triage Mapping
-    level_names = ['No DR (Level 0)', 'Mild DR (Level 1)', 'Moderate DR (Level 2)', 'Severe DR (Level 3)', 'Proliferative DR (Level 4)']
+    level_names = [
+        'Suspected Normal Retina (ICDR Level 0)',
+        'Suspected Mild NPDR (ICDR Level 1)',
+        'Suspected Moderate DR (ICDR Level 2)',
+        'Suspected Severe DR (ICDR Level 3)',
+        'Suspected Proliferative Diabetic Retinopathy (ICDR Level 4)'
+    ]
     triage_decisions = [
-        "NO REFERRAL NEEDED (Routine 24M Follow-up)",
+        "NO REFERRAL NEEDED (Routine 24M Tele-Screening)",
         "NO REFERRAL NEEDED (Annual 12M Monitoring)",
-        "REFERRAL REQUIRED (6M Tele-Ophthalmology Queue)",
-        "HIGH-RISK REFERRAL REQUIRED (3M Specialist Review)",
-        "URGENT REFERRAL REQUIRED (Immediate Laser / PRP / Anti-VEGF <2W)"
+        "OPHTHALMOLOGY REFERRAL REQUIRED\n  Further retinal examination and evaluation should be performed by a qualified ophthalmologist.",
+        "HIGH-RISK OPHTHALMOLOGY REFERRAL REQUIRED\n  Further retinal examination and evaluation should be performed by a qualified ophthalmologist within 4 weeks.",
+        "URGENT OPHTHALMOLOGY REFERRAL REQUIRED\n  Further retinal examination and treatment planning should be performed by a qualified ophthalmologist. Treatment options may include PRP and/or anti-VEGF therapy depending on clinical assessment."
     ]
     triage_criteria = [
         "Grade < 2 (Non-Referable)",
@@ -140,15 +150,19 @@ def explain_prediction(img, severity_level, referable_flag, confidence, lesion_s
     # Clinical referability rule: Levels 2, 3, 4 are strictly referable
     final_referable = bool(severity_level >= 2 or referable_flag or lesion_stats.get('nv_flag', False))
 
+    nv_text = "DETECTED BY AI — requires ophthalmologist confirmation" if lesion_stats.get('nv_flag', False) else "Absent"
+
     report_lines = [
         f"PATIENT CLINICAL DIAGNOSTIC REPORT",
         f"----------------------------------------",
-        f"• Severity Grade: {level_names[severity_level]} (Calibrated Confidence: {calibrated_confidence*100:.1f}%)",
+        f"• AI Screening Classification: {level_names[severity_level]}",
+        f"• AI Confidence: {calibrated_confidence*100:.1f}%",
         f"• Clinical Decision: {referral_text}",
         f"• Triage Criteria: {triage_criterion_text}",
-        f"• Lesion Biomarkers: MAs: {lesion_stats.get('ma_count', 0)}, Exudates: {lesion_stats.get('exudate_count', 0)} ({lesion_stats.get('exudate_area', 0.0):.0f} px), Hemorrhages: {lesion_stats.get('hem_count', 0)} ({lesion_stats.get('hem_area', 0.0):.0f} px).",
-        f"• Neovascularization: {'PRESENT (Grade 4 Marker)' if lesion_stats.get('nv_flag', False) else 'Absent'}",
-        f"• Grad-CAM Spatial IoU: {spatial_iou:.2f} (Benchmark: >= {iou_threshold:.2f}) | Pearson Correlation: {p_corr:.2f} (Benchmark: >= {pearson_threshold:.2f})",
+        f"• Lesion Biomarkers: MAs: {lesion_stats.get('ma_count', 0)}, Exudates: {lesion_stats.get('exudate_count', 0)}, Hemorrhages: {lesion_stats.get('hem_count', 0)}",
+        f"• Neovascularization: {nv_text}",
+        f"• Grad-CAM Spatial IoU: {spatial_iou:.2f} (Project threshold >= {iou_threshold:.2f})",
+        f"• Pearson Correlation: {p_corr:.2f} (Project threshold >= {pearson_threshold:.2f})",
         gating_memo
     ]
     rationale_text = "\n".join(report_lines)
