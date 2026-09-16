@@ -1812,7 +1812,7 @@ HTML_TEMPLATE = """
                     <div class="metric-cell-label">Referable Sensitivity (Grade ≥2)</div>
                 </div>
                 <div class="metric-cell spotlight-card">
-                    <div class="metric-cell-value">136,875</div>
+                    <div class="metric-cell-value">1,36,875</div>
                     <div class="metric-cell-label">Annual Hub Patient Volume</div>
                 </div>
                 <div class="metric-cell spotlight-card">
@@ -2263,7 +2263,7 @@ HTML_TEMPLATE = """
         <div class="container">
             <div class="section-header-flat">
                 <span class="section-header-tag">[ 04 / TELEMEDICINE CAPACITY PROOF ]</span>
-                <h2 class="section-header-title">136,875 Annual Patient Throughput Simulator</h2>
+                <h2 class="section-header-title"><span id="simHeaderCapacity">1,36,875</span> Annual Patient Throughput Simulator</h2>
                 <p class="section-header-desc">Discrete-event queue modeling across rural clinic networks.</p>
             </div>
 
@@ -2301,7 +2301,7 @@ HTML_TEMPLATE = """
                 <div class="telemetry-grid-flat" style="margin-bottom:0;">
                     <div class="telemetry-item-flat">
                         <div class="telemetry-item-label">Annual Patients</div>
-                        <div class="telemetry-item-value" id="simCapacity">136,875</div>
+                        <div class="telemetry-item-value" id="simCapacity">1,36,875</div>
                     </div>
                     <div class="telemetry-item-flat">
                         <div class="telemetry-item-label">Doctor Utilization</div>
@@ -2565,7 +2565,7 @@ HTML_TEMPLATE = """
                 <ul style="font-size:14px; color:var(--text-secondary); line-height:1.8; padding-left:18px;">
                     <li><strong>Prevents Blindness:</strong> Diagnoses early-stage DR (Levels 1 & 2) directly at rural Primary Health Centres (PHCs).</li>
                     <li><strong>80% Specialist Workload Reduction:</strong> Auto-triage routes only confirmed Referable cases (Level 2+) to district ophthalmologists.</li>
-                    <li><strong>136,875 Patients/Year:</strong> Discrete-event Simulink modeling proves capacity to handle annual screening volume with zero queue backlog.</li>
+                    <li><strong>1,36,875 Patients/Year:</strong> Discrete-event Simulink modeling proves capacity to handle annual screening volume with zero queue backlog.</li>
                 </ul>
             </div>
 
@@ -3134,7 +3134,11 @@ HTML_TEMPLATE = """
             document.getElementById('lblBandwidth').innerText = bw.toFixed(1) + " MBPS";
 
             const annualCap = clinics * 15 * 365;
-            document.getElementById('simCapacity').innerText = annualCap.toLocaleString();
+            const formattedCap = annualCap.toLocaleString('en-IN');
+            const simCapEl = document.getElementById('simCapacity');
+            if (simCapEl) simCapEl.innerText = formattedCap;
+            const simHeaderEl = document.getElementById('simHeaderCapacity');
+            if (simHeaderEl) simHeaderEl.innerText = formattedCap;
 
             const uploadDelay = (0.4 / (bw / 8.0)).toFixed(1);
             document.getElementById('simUploadDelay').innerText = uploadDelay + "s";
