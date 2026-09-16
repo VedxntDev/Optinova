@@ -10,7 +10,7 @@ import io
 import base64
 import cv2
 import numpy as np
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template_string, send_from_directory
 
 from test_module1 import assess_and_enhance
 from test_module2 import segment_retinal_structures
@@ -1193,27 +1193,84 @@ HTML_TEMPLATE = """
             margin-top: 6px;
         }
 
+        .preset-category-bar {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            padding: 3px;
+            margin-bottom: 10px;
+        }
+
+        .preset-cat-btn {
+            flex: 1;
+            padding: 5px 6px;
+            font-family: var(--font-mono);
+            font-size: 9.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: center;
+        }
+
+        .preset-cat-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-surface);
+        }
+
+        .preset-cat-btn.active {
+            background: var(--bg-surface-elevated);
+            color: var(--accent-gold);
+            border-color: var(--border-color);
+        }
+
+        .preset-list-flat {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-top: 6px;
+        }
+
         .preset-item-flat {
-            padding: 8px 12px;
+            padding: 9px 12px;
             border: 1px solid var(--border-color);
             background: var(--bg-surface);
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 12px;
             cursor: pointer;
-            border-left: 3px solid transparent;
-            transition: background 0.15s ease, border-color 0.15s ease;
+            border-left: 3.5px solid transparent;
+            transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+            position: relative;
         }
 
         .preset-item-flat:hover {
             background: var(--bg-surface-elevated);
             border-color: var(--accent-gold);
+            transform: translateX(2px);
         }
 
         .preset-item-flat.active {
             background: var(--bg-surface-elevated);
             border-color: var(--text-primary);
             box-shadow: inset 0 0 0 1px var(--text-primary);
+        }
+
+        @keyframes pulse-ai-match {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); }
+            70% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        .preset-item-flat.ai-matched {
+            border-color: var(--accent-gold) !important;
+            background: rgba(245, 158, 11, 0.08) !important;
+            animation: pulse-ai-match 2s infinite;
         }
 
         .preset-g0 { border-left-color: var(--accent-emerald); }
@@ -1223,35 +1280,99 @@ HTML_TEMPLATE = """
         .preset-g4 { border-left-color: var(--accent-rose); }
         .preset-qc { border-left-color: #94a3b8; }
 
+        .preset-thumb-box {
+            width: 42px;
+            height: 42px;
+            background: #000000;
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .preset-thumb-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s ease;
+        }
+
+        .preset-item-flat:hover .preset-thumb-img {
+            transform: scale(1.1);
+        }
+
+        .preset-grade-badge {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 4px;
+            border: 1px solid currentColor;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-g0 { color: #10b981; background: rgba(16, 185, 129, 0.12); }
+        .badge-g1 { color: #38bdf8; background: rgba(56, 189, 248, 0.12); }
+        .badge-g2 { color: #f59e0b; background: rgba(245, 158, 11, 0.12); }
+        .badge-g3 { color: #fb923c; background: rgba(251, 146, 60, 0.12); }
+        .badge-g4 { color: #f43f5e; background: rgba(244, 63, 94, 0.14); }
+        .badge-qc { color: #94a3b8; background: rgba(148, 163, 184, 0.12); }
+
         .preset-info {
             display: flex;
             flex-direction: column;
             gap: 2px;
             text-align: left;
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .preset-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
         }
 
         .preset-title {
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11.5px;
+            font-weight: 700;
             color: var(--text-primary);
             letter-spacing: -0.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .preset-icd {
+            font-family: var(--font-mono);
+            font-size: 8.5px;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
         }
 
         .preset-sub {
-            font-size: 10px;
+            font-size: 9.5px;
             color: var(--text-muted);
             font-family: var(--font-body);
+            line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .preset-tag-flat {
             font-family: var(--font-mono);
-            font-size: 9.5px;
+            font-size: 9px;
             font-weight: 700;
-            padding: 3px 7px;
+            padding: 2px 6px;
             border: 1px solid var(--border-color);
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.03em;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .tag-g0 { color: #10b981; background: rgba(16, 185, 129, 0.10); border-color: rgba(16, 185, 129, 0.35); }
@@ -1261,6 +1382,99 @@ HTML_TEMPLATE = """
         .tag-g4 { color: #f43f5e; background: rgba(244, 63, 94, 0.12); border-color: rgba(244, 63, 94, 0.40); }
         .tag-clahe { color: var(--accent-gold); background: rgba(245, 158, 11, 0.10); border-color: rgba(245, 158, 11, 0.30); }
         .tag-drop { color: #f43f5e; background: rgba(244, 63, 94, 0.10); border-color: rgba(244, 63, 94, 0.35); }
+
+        .preset-match-badge {
+            display: none;
+            position: absolute;
+            top: -6px;
+            right: 10px;
+            background: var(--accent-gold);
+            color: #000000;
+            font-family: var(--font-mono);
+            font-size: 8px;
+            font-weight: 800;
+            padding: 1px 5px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .preset-item-flat.ai-matched .preset-match-badge {
+            display: block;
+        }
+
+        /* Severity index mini-dots */
+        .severity-dots {
+            display: flex;
+            gap: 2.5px;
+            margin-top: 3px;
+        }
+
+        .sev-dot {
+            width: 8px;
+            height: 2px;
+            background: var(--border-color);
+        }
+
+        .sev-dot.active-g0 { background: #10b981; }
+        .sev-dot.active-g1 { background: #38bdf8; }
+        .sev-dot.active-g2 { background: #f59e0b; }
+        .sev-dot.active-g3 { background: #fb923c; }
+        .sev-dot.active-g4 { background: #f43f5e; }
+
+        /* ICDR Clinical Reference Modal */
+        .icdr-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .icdr-modal-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            max-width: 840px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        .icdr-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11.5px;
+            text-align: left;
+        }
+
+        .icdr-table th {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 10px 12px;
+            background: var(--bg-body);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .icdr-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+            color: var(--text-primary);
+        }
+
+        .icdr-table tr:hover td {
+            background: var(--bg-surface-elevated);
+        }
 
         .quad-grid-flat {
             display: grid;
@@ -2236,82 +2450,248 @@ HTML_TEMPLATE = """
                         <span>Execute AI Pipeline</span>
                     </button>
 
-                    <!-- ICDR 5-Tier Disease Severity Grading -->
-                    <div style="margin-top:24px;">
+                    <!-- Category Filter Tabs & ICDR Reference Guide Button -->
+                    <div style="margin-top:20px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                             <span style="font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted);">
+                                Benchmark Cohort Presets:
+                            </span>
+                            <button class="btn-sharp" style="padding:2px 7px; font-size:9.5px; gap:4px;" onclick="openIcdrGuideModal()">
+                                <span>📖 ICDR Criteria Guide</span>
+                            </button>
+                        </div>
+
+                        <div class="preset-category-bar">
+                            <button class="preset-cat-btn active" id="btnCatAll" onclick="filterPresetCategory('all')">All (9)</button>
+                            <button class="preset-cat-btn" id="btnCatIcdr" onclick="filterPresetCategory('icdr')">🔬 ICDR 0–4 (5)</button>
+                            <button class="preset-cat-btn" id="btnCatQc" onclick="filterPresetCategory('qc')">🛡️ QC Stress (4)</button>
+                        </div>
+                    </div>
+
+                    <!-- ICDR 5-Tier Disease Severity Grading -->
+                    <div id="sectionIcdrPresets">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <span style="font-family:var(--font-mono); font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted);">
                                 ICDR Clinical Progression (0–4):
                             </span>
-                            <span style="font-family:var(--font-mono); font-size:9px; color:var(--accent-emerald); font-weight:600;">5-TIER</span>
+                            <span style="font-family:var(--font-mono); font-size:8.5px; color:var(--accent-emerald); font-weight:700; letter-spacing:0.04em;">WHO / ETDRS SCALE</span>
                         </div>
                         <div class="preset-list-flat">
-                            <div class="preset-item-flat preset-g0" id="preset-sample_01_clear.png" onclick="selectSample('sample_01_clear.png')">
-                                <div class="preset-info">
-                                    <div class="preset-title">Grade 0: Normal Retina</div>
-                                    <div class="preset-sub">Clear vascular tree • No lesions</div>
+                            <!-- Grade 0 -->
+                            <div class="preset-item-flat preset-g0 cat-icdr" id="preset-sample_01_clear.png" onclick="selectSample('sample_01_clear.png')">
+                                <div class="preset-match-badge" id="match-sample_01_clear.png">● AI MATCH</div>
+                                <div class="preset-thumb-box">
+                                    <img class="preset-thumb-img" src="/sample_image/sample_01_clear.png" alt="G0" onerror="this.style.display='none'">
                                 </div>
-                                <span class="preset-tag-flat tag-g0">Routine</span>
+                                <div class="preset-info">
+                                    <div class="preset-header-row">
+                                        <div style="display:flex; align-items:center; gap:5px;">
+                                            <span class="preset-grade-badge badge-g0">G0</span>
+                                            <span class="preset-title">Grade 0: Normal Retina</span>
+                                        </div>
+                                        <span class="preset-tag-flat tag-g0">Routine 12M</span>
+                                    </div>
+                                    <div class="preset-icd">ICD-10: E11.319 • ETDRS Level 10</div>
+                                    <div class="preset-sub">Clear vascular tree • Crisp FAZ • No microaneurysms</div>
+                                    <div class="severity-dots">
+                                        <div class="sev-dot active-g0"></div>
+                                        <div class="sev-dot"></div>
+                                        <div class="sev-dot"></div>
+                                        <div class="sev-dot"></div>
+                                        <div class="sev-dot"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="preset-item-flat preset-g1" id="preset-sample_01b_mild_dr.png" onclick="selectSample('sample_01b_mild_dr.png')">
-                                <div class="preset-info">
-                                    <div class="preset-title">Grade 1: Mild NPDR</div>
-                                    <div class="preset-sub">Microaneurysms only (isolated MAs)</div>
+
+                            <!-- Grade 1 -->
+                            <div class="preset-item-flat preset-g1 cat-icdr" id="preset-sample_01b_mild_dr.png" onclick="selectSample('sample_01b_mild_dr.png')">
+                                <div class="preset-match-badge" id="match-sample_01b_mild_dr.png">● AI MATCH</div>
+                                <div class="preset-thumb-box">
+                                    <img class="preset-thumb-img" src="/sample_image/sample_01b_mild_dr.png" alt="G1" onerror="this.style.display='none'">
                                 </div>
-                                <span class="preset-tag-flat tag-g1">Monitor 12M</span>
+                                <div class="preset-info">
+                                    <div class="preset-header-row">
+                                        <div style="display:flex; align-items:center; gap:5px;">
+                                            <span class="preset-grade-badge badge-g1">G1</span>
+                                            <span class="preset-title">Grade 1: Mild NPDR</span>
+                                        </div>
+                                        <span class="preset-tag-flat tag-g1">Monitor 6-12M</span>
+                                    </div>
+                                    <div class="preset-icd">ICD-10: E11.329 • ETDRS Level 20</div>
+                                    <div class="preset-sub">Microaneurysms only (isolated MAs &le; 5) • No exudates</div>
+                                    <div class="severity-dots">
+                                        <div class="sev-dot active-g1"></div>
+                                        <div class="sev-dot active-g1"></div>
+                                        <div class="sev-dot"></div>
+                                        <div class="sev-dot"></div>
+                                        <div class="sev-dot"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="preset-item-flat preset-g2" id="preset-sample_06_moderate_dr.png" onclick="selectSample('sample_06_moderate_dr.png')">
-                                <div class="preset-info">
-                                    <div class="preset-title">Grade 2: Moderate DR</div>
-                                    <div class="preset-sub">Hard Exudates + Multiple MAs</div>
+
+                            <!-- Grade 2 -->
+                            <div class="preset-item-flat preset-g2 cat-icdr" id="preset-sample_06_moderate_dr.png" onclick="selectSample('sample_06_moderate_dr.png')">
+                                <div class="preset-match-badge" id="match-sample_06_moderate_dr.png">● AI MATCH</div>
+                                <div class="preset-thumb-box">
+                                    <img class="preset-thumb-img" src="/sample_image/sample_06_moderate_dr.png" alt="G2" onerror="this.style.display='none'">
                                 </div>
-                                <span class="preset-tag-flat tag-g2">Referable</span>
+                                <div class="preset-info">
+                                    <div class="preset-header-row">
+                                        <div style="display:flex; align-items:center; gap:5px;">
+                                            <span class="preset-grade-badge badge-g2">G2</span>
+                                            <span class="preset-title">Grade 2: Moderate DR</span>
+                                        </div>
+                                        <span class="preset-tag-flat tag-g2">Referable</span>
+                                    </div>
+                                    <div class="preset-icd">ICD-10: E11.339 • ETDRS Level 35–43</div>
+                                    <div class="preset-sub">Hard Lipid Exudates + Multiple MAs + Cotton Wool Spots</div>
+                                    <div class="severity-dots">
+                                        <div class="sev-dot active-g2"></div>
+                                        <div class="sev-dot active-g2"></div>
+                                        <div class="sev-dot active-g2"></div>
+                                        <div class="sev-dot"></div>
+                                        <div class="sev-dot"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="preset-item-flat preset-g3" id="preset-sample_07_severe_dr.png" onclick="selectSample('sample_07_severe_dr.png')">
-                                <div class="preset-info">
-                                    <div class="preset-title">Grade 3: Severe DR</div>
-                                    <div class="preset-sub">Multi-quadrant Blot Hemorrhages</div>
+
+                            <!-- Grade 3 -->
+                            <div class="preset-item-flat preset-g3 cat-icdr" id="preset-sample_07_severe_dr.png" onclick="selectSample('sample_07_severe_dr.png')">
+                                <div class="preset-match-badge" id="match-sample_07_severe_dr.png">● AI MATCH</div>
+                                <div class="preset-thumb-box">
+                                    <img class="preset-thumb-img" src="/sample_image/sample_07_severe_dr.png" alt="G3" onerror="this.style.display='none'">
                                 </div>
-                                <span class="preset-tag-flat tag-g3">High Risk</span>
+                                <div class="preset-info">
+                                    <div class="preset-header-row">
+                                        <div style="display:flex; align-items:center; gap:5px;">
+                                            <span class="preset-grade-badge badge-g3">G3</span>
+                                            <span class="preset-title">Grade 3: Severe DR</span>
+                                        </div>
+                                        <span class="preset-tag-flat tag-g3">High Risk &lt;4W</span>
+                                    </div>
+                                    <div class="preset-icd">ICD-10: E11.349 • ETDRS Level 53A-E (4-2-1 Rule)</div>
+                                    <div class="preset-sub">4-Quadrant Blot Hemorrhages • Venous Beading &bull; IRMA</div>
+                                    <div class="severity-dots">
+                                        <div class="sev-dot active-g3"></div>
+                                        <div class="sev-dot active-g3"></div>
+                                        <div class="sev-dot active-g3"></div>
+                                        <div class="sev-dot active-g3"></div>
+                                        <div class="sev-dot"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="preset-item-flat preset-g4" id="preset-sample_08_proliferative_dr.png" onclick="selectSample('sample_08_proliferative_dr.png')">
-                                <div class="preset-info">
-                                    <div class="preset-title">Grade 4: Proliferative</div>
-                                    <div class="preset-sub">Optic Disc Neovascularization (NVD)</div>
+
+                            <!-- Grade 4 -->
+                            <div class="preset-item-flat preset-g4 cat-icdr" id="preset-sample_08_proliferative_dr.png" onclick="selectSample('sample_08_proliferative_dr.png')">
+                                <div class="preset-match-badge" id="match-sample_08_proliferative_dr.png">● AI MATCH</div>
+                                <div class="preset-thumb-box">
+                                    <img class="preset-thumb-img" src="/sample_image/sample_08_proliferative_dr.png" alt="G4" onerror="this.style.display='none'">
                                 </div>
-                                <span class="preset-tag-flat tag-g4">Urgent NV</span>
+                                <div class="preset-info">
+                                    <div class="preset-header-row">
+                                        <div style="display:flex; align-items:center; gap:5px;">
+                                            <span class="preset-grade-badge badge-g4">G4</span>
+                                            <span class="preset-title">Grade 4: Proliferative</span>
+                                        </div>
+                                        <span class="preset-tag-flat tag-g4">Urgent NV / PRP</span>
+                                    </div>
+                                    <div class="preset-icd">ICD-10: E11.359 • ETDRS Level 61–85</div>
+                                    <div class="preset-sub">Optic Disc Neovascularization (NVD/NVE) • Fibrous growth</div>
+                                    <div class="severity-dots">
+                                        <div class="sev-dot active-g4"></div>
+                                        <div class="sev-dot active-g4"></div>
+                                        <div class="sev-dot active-g4"></div>
+                                        <div class="sev-dot active-g4"></div>
+                                        <div class="sev-dot active-g4"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Edge DSP Quality Gatekeeper Tests -->
-                    <div style="margin-top:20px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <span style="font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted);">
+                    <div id="sectionQcPresets" style="margin-top:18px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <span style="font-family:var(--font-mono); font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted);">
                                 Edge DSP Quality Gatekeeper:
                             </span>
-                            <span style="font-family:var(--font-mono); font-size:9px; color:var(--accent-gold); font-weight:600;">&lt;40MS PRE-SCREEN</span>
+                            <span style="font-family:var(--font-mono); font-size:8.5px; color:var(--accent-gold); font-weight:700;">&lt;40MS PRE-SCREEN</span>
                         </div>
                         <div class="preset-list-flat">
-                            <div class="preset-item-flat preset-qc" id="preset-sample_02_low_contrast.png" onclick="selectSample('sample_02_low_contrast.png')">
-                                <div class="preset-info">
-                                    <div class="preset-title">Low Contrast Scan</div>
-                                    <div class="preset-sub">Uneven illumination • Needs CLAHE</div>
+                            <!-- Low Contrast -->
+                            <div class="preset-item-flat preset-qc cat-qc" id="preset-sample_02_low_contrast.png" onclick="selectSample('sample_02_low_contrast.png')">
+                                <div class="preset-match-badge" id="match-sample_02_low_contrast.png">● AI MATCH</div>
+                                <div class="preset-thumb-box">
+                                    <img class="preset-thumb-img" src="/sample_image/sample_02_low_contrast.png" alt="QC Low Contrast" onerror="this.style.display='none'">
                                 </div>
-                                <span class="preset-tag-flat tag-clahe">CLAHE</span>
+                                <div class="preset-info">
+                                    <div class="preset-header-row">
+                                        <div style="display:flex; align-items:center; gap:5px;">
+                                            <span class="preset-grade-badge badge-qc">QC</span>
+                                            <span class="preset-title">Low Contrast Scan</span>
+                                        </div>
+                                        <span class="preset-tag-flat tag-clahe">CLAHE Boost</span>
+                                    </div>
+                                    <div class="preset-icd">DSP Metric: SNR &lt; 12 dB • Uneven Flash</div>
+                                    <div class="preset-sub">Uneven illumination &bull; Auto-equalized via CIELAB CLAHE</div>
+                                </div>
                             </div>
-                            <div class="preset-item-flat preset-qc" id="preset-sample_03_blurry.png" onclick="selectSample('sample_03_blurry.png')">
-                                <div class="preset-info">
-                                    <div class="preset-title">Blurry Scan</div>
-                                    <div class="preset-sub">Laplacian Var(∇²I) &lt; τ • Focus Drop</div>
+
+                            <!-- Blurry Scan -->
+                            <div class="preset-item-flat preset-qc cat-qc" id="preset-sample_03_blurry.png" onclick="selectSample('sample_03_blurry.png')">
+                                <div class="preset-match-badge" id="match-sample_03_blurry.png">● AI MATCH</div>
+                                <div class="preset-thumb-box">
+                                    <img class="preset-thumb-img" src="/sample_image/sample_03_blurry.png" alt="QC Blurry" onerror="this.style.display='none'">
                                 </div>
-                                <span class="preset-tag-flat tag-drop">Drop &lt; τ</span>
+                                <div class="preset-info">
+                                    <div class="preset-header-row">
+                                        <div style="display:flex; align-items:center; gap:5px;">
+                                            <span class="preset-grade-badge badge-qc">QC</span>
+                                            <span class="preset-title">Blurry Scan</span>
+                                        </div>
+                                        <span class="preset-tag-flat tag-drop">Reject &lt; &tau;</span>
+                                    </div>
+                                    <div class="preset-icd">DSP Metric: Var(&nabla;&sup2;I) &lt; 40.0 &bull; Focus Drop</div>
+                                    <div class="preset-sub">Motion artifact &bull; Dropped at edge to prevent misdiagnosis</div>
+                                </div>
                             </div>
-                            <div class="preset-item-flat preset-qc" id="preset-sample_05_cropped.png" onclick="selectSample('sample_05_cropped.png')">
-                                <div class="preset-info">
-                                    <div class="preset-title">Incomplete FOV</div>
-                                    <div class="preset-sub">Aperture clipping / boundary error</div>
+
+                            <!-- Incomplete FOV -->
+                            <div class="preset-item-flat preset-qc cat-qc" id="preset-sample_05_cropped.png" onclick="selectSample('sample_05_cropped.png')">
+                                <div class="preset-match-badge" id="match-sample_05_cropped.png">● AI MATCH</div>
+                                <div class="preset-thumb-box">
+                                    <img class="preset-thumb-img" src="/sample_image/sample_05_cropped.png" alt="QC Cropped" onerror="this.style.display='none'">
                                 </div>
-                                <span class="preset-tag-flat tag-drop">FOV Drop</span>
+                                <div class="preset-info">
+                                    <div class="preset-header-row">
+                                        <div style="display:flex; align-items:center; gap:5px;">
+                                            <span class="preset-grade-badge badge-qc">QC</span>
+                                            <span class="preset-title">Incomplete FOV</span>
+                                        </div>
+                                        <span class="preset-tag-flat tag-drop">FOV Reject</span>
+                                    </div>
+                                    <div class="preset-icd">DSP Metric: Retinal Area &lt; 85% &bull; Aperture Clip</div>
+                                    <div class="preset-sub">Aperture clipping error &bull; Prompts operator to realign lens</div>
+                                </div>
+                            </div>
+
+                            <!-- Dark Scan -->
+                            <div class="preset-item-flat preset-qc cat-qc" id="preset-sample_04_dark.png" onclick="selectSample('sample_04_dark.png')">
+                                <div class="preset-match-badge" id="match-sample_04_dark.png">● AI MATCH</div>
+                                <div class="preset-thumb-box">
+                                    <img class="preset-thumb-img" src="/sample_image/sample_04_dark.png" alt="QC Dark" onerror="this.style.display='none'">
+                                </div>
+                                <div class="preset-info">
+                                    <div class="preset-header-row">
+                                        <div style="display:flex; align-items:center; gap:5px;">
+                                            <span class="preset-grade-badge badge-qc">QC</span>
+                                            <span class="preset-title">Underexposed Scan</span>
+                                        </div>
+                                        <span class="preset-tag-flat tag-clahe">Gamma Boost</span>
+                                    </div>
+                                    <div class="preset-icd">DSP Metric: Mean Luminance L&#772; &lt; 28</div>
+                                    <div class="preset-sub">Sub-optimal flash &bull; Enhanced via adaptive gamma restoration</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2905,6 +3285,82 @@ HTML_TEMPLATE = """
         </div>
     </div>
 
+    <!-- ICDR Clinical Reference Guide Modal -->
+    <div class="icdr-modal-backdrop no-print" id="icdrGuideModal" onclick="closeIcdrGuideModal(event)">
+        <div class="icdr-modal-card spotlight-card" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding:16px 20px; background:var(--bg-body);">
+                <div>
+                    <div style="font-family:var(--font-mono); font-size:10px; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.04em;">
+                        CLINICAL OPHTHALMOLOGY PROTOCOL • WHO / AAO / ICO STANDARDS
+                    </div>
+                    <h3 style="font-family:var(--font-display); font-size:18px; font-weight:700; text-transform:uppercase; margin-top:2px;">
+                        ICDR 5-Tier Diabetic Retinopathy Diagnostic Criteria
+                    </h3>
+                </div>
+                <button class="btn-sharp" onclick="closeIcdrGuideModal()">[ ESC / CLOSE ]</button>
+            </div>
+
+            <div style="padding:20px;">
+                <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.6; margin-bottom:16px;">
+                    The <strong>International Clinical Diabetic Retinopathy (ICDR) Disease Severity Scale</strong> standardizes fundus grading into 5 validated stages. OptiNova AI applies Platt-calibrated soft probabilities tuned via <strong>Youden's J-Index (&tau; = 0.40)</strong> to prioritize referable case sensitivity (&gt;90%) for rural tele-triage.
+                </p>
+
+                <table class="icdr-table">
+                    <thead>
+                        <tr>
+                            <th style="width:75px;">Stage</th>
+                            <th style="width:110px;">ICD-10 / ETDRS</th>
+                            <th>Clinical Biomarkers &amp; Findings</th>
+                            <th style="width:130px;">Action Protocol</th>
+                            <th style="width:105px;">Triage Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="preset-grade-badge badge-g0">Grade 0</span></td>
+                            <td><code>E11.319</code><br><span style="font-size:10px; color:var(--text-muted);">ETDRS L10</span></td>
+                            <td><strong>No Apparent Retinopathy:</strong> Crisp foveal avascular zone (FAZ), clean optic disc margin, normal vascular caliber, zero microaneurysms or exudates.</td>
+                            <td>Routine annual tele-screening</td>
+                            <td><span class="preset-tag-flat tag-g0">Non-Referable</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="preset-grade-badge badge-g1">Grade 1</span></td>
+                            <td><code>E11.329</code><br><span style="font-size:10px; color:var(--text-muted);">ETDRS L20</span></td>
+                            <td><strong>Mild NPDR:</strong> Isolated microaneurysms only (&le; 5 MAs detected across standard 45&deg; field). No hard exudates, hemorrhages, or CWS.</td>
+                            <td>Glycemic control &amp; 6–12 month follow-up</td>
+                            <td><span class="preset-tag-flat tag-g1">Non-Referable</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="preset-grade-badge badge-g2">Grade 2</span></td>
+                            <td><code>E11.339</code><br><span style="font-size:10px; color:var(--text-muted);">ETDRS L35–43</span></td>
+                            <td><strong>Moderate NPDR:</strong> Multiple MAs (&gt; 5), lipid hard exudates, cotton wool spots (CWS), and/or mild retinal blot hemorrhages.</td>
+                            <td>Refer to Ophthalmologist within 2–3 months</td>
+                            <td><span class="preset-tag-flat tag-g2">Referable (&tau;&ge;0.40)</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="preset-grade-badge badge-g3">Grade 3</span></td>
+                            <td><code>E11.349</code><br><span style="font-size:10px; color:var(--text-muted);">ETDRS L53A-E</span></td>
+                            <td><strong>Severe NPDR (4-2-1 Rule):</strong> Severe blot hemorrhages in all 4 quadrants, definite venous beading in &ge;2 quadrants, or prominent IRMA in &ge;1 quadrant.</td>
+                            <td>Urgent Ophthalmologist evaluation (&lt; 4 weeks)</td>
+                            <td><span class="preset-tag-flat tag-g3">High Risk</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="preset-grade-badge badge-g4">Grade 4</span></td>
+                            <td><code>E11.359</code><br><span style="font-size:10px; color:var(--text-muted);">ETDRS L61–85</span></td>
+                            <td><strong>Proliferative DR (PDR):</strong> Active Neovascularization of Disc (NVD &gt; 1/3 disc area) or Elsewhere (NVE), preretinal/vitreous hemorrhage, fibrous proliferation.</td>
+                            <td>Emergency Panretinal Photocoagulation (PRP) / Anti-VEGF</td>
+                            <td><span class="preset-tag-flat tag-g4">Urgent Sight-Threat</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="margin-top:16px; padding:12px; background:var(--bg-body); border:1px solid var(--border-color); font-family:var(--font-mono); font-size:10.5px; color:var(--text-secondary); line-height:1.5;">
+                    <strong style="color:var(--accent-gold);">Diagnostic Governance Note:</strong> Under the SIH26038 specification, Grade &ge; 2 cases are automatically triaged to the District Tele-Ophthalmology queue with a mandatory 30-second multi-spectral physician adjudication checklist.
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Pitch Deck Modal -->
     <div class="modal-flat-backdrop no-print" id="pitchModal" onclick="closePitchModal(event)">
         <div class="modal-flat-box" onclick="event.stopPropagation()">
@@ -3101,10 +3557,50 @@ HTML_TEMPLATE = """
             }
         }
 
+        // Preset Category Filtering (All, ICDR 0-4, QC Stress)
+        function filterPresetCategory(cat) {
+            document.querySelectorAll('.preset-cat-btn').forEach(btn => btn.classList.remove('active'));
+            const secIcdr = document.getElementById('sectionIcdrPresets');
+            const secQc = document.getElementById('sectionQcPresets');
+
+            if (cat === 'all') {
+                document.getElementById('btnCatAll').classList.add('active');
+                if (secIcdr) secIcdr.style.display = 'block';
+                if (secQc) secQc.style.display = 'block';
+                document.querySelectorAll('.preset-item-flat').forEach(el => el.style.display = 'flex');
+            } else if (cat === 'icdr') {
+                document.getElementById('btnCatIcdr').classList.add('active');
+                if (secIcdr) secIcdr.style.display = 'block';
+                if (secQc) secQc.style.display = 'none';
+                document.querySelectorAll('.cat-icdr').forEach(el => el.style.display = 'flex');
+                document.querySelectorAll('.cat-qc').forEach(el => el.style.display = 'none');
+            } else if (cat === 'qc') {
+                document.getElementById('btnCatQc').classList.add('active');
+                if (secIcdr) secIcdr.style.display = 'none';
+                if (secQc) secQc.style.display = 'block';
+                document.querySelectorAll('.cat-icdr').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.cat-qc').forEach(el => el.style.display = 'flex');
+            }
+        }
+
+        // ICDR Clinical Reference Modal
+        function openIcdrGuideModal() {
+            const m = document.getElementById('icdrGuideModal');
+            if (m) m.style.display = 'flex';
+        }
+
+        function closeIcdrGuideModal(event) {
+            if (event && event.target && !event.target.classList.contains('icdr-modal-backdrop') && !event.target.classList.contains('btn-sharp')) return;
+            const m = document.getElementById('icdrGuideModal');
+            if (m) m.style.display = 'none';
+        }
+
         function selectSample(sampleName) {
             selectedSampleName = sampleName;
             selectedFile = null;
-            document.querySelectorAll('.preset-item-flat').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.preset-item-flat').forEach(el => {
+                el.classList.remove('active', 'ai-matched');
+            });
             const target = document.getElementById('preset-' + sampleName);
             if (target) target.classList.add('active');
             document.getElementById('fileSelectionText').innerText = "[ PRESET: " + sampleName + " ]";
@@ -3260,6 +3756,40 @@ HTML_TEMPLATE = """
                         badge.innerText = "ROUTINE / NORMAL";
                         badge.style.color = "var(--accent-emerald)";
                         badge.style.borderColor = "var(--accent-emerald)";
+                    }
+
+                    // Dynamically highlight the diagnosed ICDR Grade or QC card in sidebar
+                    document.querySelectorAll('.preset-item-flat').forEach(el => el.classList.remove('ai-matched'));
+                    const gradeSampleMap = {
+                        0: 'sample_01_clear.png',
+                        1: 'sample_01b_mild_dr.png',
+                        2: 'sample_06_moderate_dr.png',
+                        3: 'sample_07_severe_dr.png',
+                        4: 'sample_08_proliferative_dr.png'
+                    };
+                    
+                    let matchedSampleId = null;
+                    if (data.status === 'reject') {
+                        const reason = (data.rationale || "").toLowerCase();
+                        if (reason.includes('blur') || reason.includes('focus')) matchedSampleId = 'sample_03_blurry.png';
+                        else if (reason.includes('fov') || reason.includes('aperture') || reason.includes('crop')) matchedSampleId = 'sample_05_cropped.png';
+                        else if (reason.includes('dark') || reason.includes('underexpos')) matchedSampleId = 'sample_04_dark.png';
+                        else matchedSampleId = 'sample_02_low_contrast.png';
+                    } else if (data.grade_level !== undefined && gradeSampleMap[data.grade_level]) {
+                        matchedSampleId = gradeSampleMap[data.grade_level];
+                    }
+
+                    if (matchedSampleId) {
+                        const matchedEl = document.getElementById('preset-' + matchedSampleId);
+                        const matchBadge = document.getElementById('match-' + matchedSampleId);
+                        if (matchedEl) matchedEl.classList.add('ai-matched');
+                        if (matchBadge) {
+                            if (data.status === 'reject') {
+                                matchBadge.innerText = '● AI REJECT';
+                            } else {
+                                matchBadge.innerText = `● AI DETECTED (${(data.confidence * 100).toFixed(0)}%)`;
+                            }
+                        }
                     }
 
                     document.getElementById('imgOrig').src = "data:image/jpeg;base64," + data.img_orig;
@@ -4192,6 +4722,12 @@ HTML_TEMPLATE = """
 @app.route('/')
 def index():
     return render_template_string(HTML_TEMPLATE)
+
+@app.route('/sample_image/<path:filename>')
+def serve_sample_image(filename):
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    sample_dir = os.path.join(base_dir, 'data', 'sample_images')
+    return send_from_directory(sample_dir, filename)
 
 # Global Study Audit Registry & Session Storage
 STUDY_REGISTRY = {}
