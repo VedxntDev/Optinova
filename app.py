@@ -715,12 +715,17 @@ HTML_TEMPLATE = """
         .split-box-flat {
             position: relative;
             width: 100%;
-            height: 250px;
-            background: #000000;
+            height: 380px;
+            background: #040508;
             border: 1px solid var(--border-color);
             overflow: hidden;
             margin-bottom: 20px;
             user-select: none;
+            cursor: ew-resize;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            --split-pct: 50%;
         }
 
         .split-box-flat img {
@@ -730,35 +735,90 @@ HTML_TEMPLATE = """
             width: 100%;
             height: 100%;
             object-fit: contain;
+            pointer-events: none;
         }
 
-        .split-layer-flat {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
-            height: 100%;
-            overflow: hidden;
-            border-right: 1px solid var(--accent-gold);
+        .split-img-overlay {
+            /* Pixel-perfect 1:1 overlay alignment with exact same dimensions */
+            clip-path: polygon(0 0, var(--split-pct, 50%) 0, var(--split-pct, 50%) 100%, 0 100%);
+            -webkit-clip-path: polygon(0 0, var(--split-pct, 50%) 0, var(--split-pct, 50%) 100%, 0 100%);
+            will-change: clip-path;
+            z-index: 5;
         }
 
-        .split-layer-flat img {
+        .split-divider-line {
             position: absolute;
             top: 0;
-            left: 0;
-            height: 100%;
-            max-width: none;
-        }
-
-        .split-cursor-flat {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            height: 100%;
+            bottom: 0;
+            left: var(--split-pct, 50%);
             width: 2px;
-            background: var(--accent-gold);
-            cursor: ew-resize;
-            z-index: 10;
+            background: var(--accent-gold-bright);
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.7);
+            transform: translateX(-50%);
+            z-index: 20;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .split-handle-pill {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-surface-elevated);
+            border: 1.5px solid var(--accent-gold-bright);
+            color: var(--accent-gold-bright);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.7), 0 0 10px rgba(245, 158, 11, 0.4);
+            cursor: grab;
+            pointer-events: auto;
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+
+        .split-handle-pill:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+            background: var(--accent-gold-bright);
+            color: #000000;
+        }
+
+        .split-tag-badge {
+            position: absolute;
+            top: 14px;
+            padding: 4px 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            background: rgba(15, 17, 23, 0.88);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            z-index: 15;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+        }
+
+        .split-tag-badge.tag-left {
+            left: 14px;
+            border-left: 2px solid var(--accent-gold);
+        }
+
+        .split-tag-badge.tag-right {
+            right: 14px;
+            border-right: 2px solid var(--accent-emerald);
+        }
+
+        .quad-card-flat.active-quad {
+            border-color: var(--accent-gold) !important;
+            background: var(--bg-surface-elevated) !important;
+        }
+
+        .quad-card-flat.active-quad .quad-label-flat {
+            color: var(--accent-gold-bright) !important;
+            font-weight: 700 !important;
         }
 
         .telemetry-grid-flat {
@@ -1332,13 +1392,24 @@ HTML_TEMPLATE = """
                             </div>
                         </div>
 
-                        <!-- Split Comparison Box -->
+                        <!-- Split Comparison Box with 1:1 Aligned Optical Overlay -->
                         <div class="split-box-flat" id="splitSlider">
-                            <img id="splitImgBase" src="" alt="Raw Base">
-                            <div class="split-layer-flat" id="splitOverlay">
-                                <img id="splitImgOverlay" src="" alt="Enhanced Overlay">
+                            <img id="splitImgBase" class="split-img-base" src="" alt="Raw Base">
+                            <img id="splitImgOverlay" class="split-img-overlay" src="" alt="AI Multi-Modal Overlay">
+                            
+                            <div class="split-divider-line" id="splitHandle">
+                                <div class="split-handle-pill">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="15 18 9 12 15 6"></polyline>
+                                    </svg>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </div>
                             </div>
-                            <div class="split-cursor-flat" id="splitHandle"></div>
+
+                            <div class="split-tag-badge tag-left" id="splitLeftTag">RAW ACQUISITION</div>
+                            <div class="split-tag-badge tag-right" id="splitRightTag">CLAHE ENHANCED (MOD 1)</div>
                         </div>
 
                         <!-- 4 Quad Views -->
@@ -1892,8 +1963,8 @@ HTML_TEMPLATE = """
                 document.getElementById('imgOverlay').src = "data:image/jpeg;base64," + data.img_overlay;
                 document.getElementById('imgGradcam').src = "data:image/jpeg;base64," + data.img_gradcam;
 
-                document.getElementById('splitImgBase').src = "data:image/jpeg;base64," + data.img_orig;
-                document.getElementById('splitImgOverlay').src = "data:image/jpeg;base64," + data.img_enhanced;
+                if (splitSlider) splitSlider.style.setProperty('--split-pct', '50%');
+                setSplitMode('enhanced', 'CLAHE');
 
                 document.getElementById('bmMAs').innerText = data.stats.ma_count || 0;
                 document.getElementById('bmExudates').innerText = data.stats.exudate_count || 0;
@@ -2098,42 +2169,74 @@ HTML_TEMPLATE = """
             document.getElementById('doctorReportModal').style.display = 'none';
         }
 
-        // Split Comparison
+        // Split Comparison Slider & Quad Mode Selection
         function setSplitMode(type, label) {
             if (!lastScreenData) return;
             const base = document.getElementById('splitImgBase');
             const overlay = document.getElementById('splitImgOverlay');
+            const rightTag = document.getElementById('splitRightTag');
 
             base.src = "data:image/jpeg;base64," + lastScreenData.img_orig;
-            if (type === 'enhanced') overlay.src = "data:image/jpeg;base64," + lastScreenData.img_enhanced;
-            else if (type === 'overlay') overlay.src = "data:image/jpeg;base64," + lastScreenData.img_overlay;
-            else if (type === 'gradcam') overlay.src = "data:image/jpeg;base64," + lastScreenData.img_gradcam;
-            else overlay.src = "data:image/jpeg;base64," + lastScreenData.img_enhanced;
+            if (type === 'orig') {
+                overlay.src = "data:image/jpeg;base64," + lastScreenData.img_orig;
+                if (rightTag) rightTag.innerText = "RAW CAPTURE";
+            } else if (type === 'enhanced') {
+                overlay.src = "data:image/jpeg;base64," + lastScreenData.img_enhanced;
+                if (rightTag) rightTag.innerText = "CLAHE ENHANCED (MOD 1)";
+            } else if (type === 'overlay') {
+                overlay.src = "data:image/jpeg;base64," + lastScreenData.img_overlay;
+                if (rightTag) rightTag.innerText = "LESION MASKS (MOD 2)";
+            } else if (type === 'gradcam') {
+                overlay.src = "data:image/jpeg;base64," + lastScreenData.img_gradcam;
+                if (rightTag) rightTag.innerText = "GRAD-CAM XAI (MOD 4)";
+            } else {
+                overlay.src = "data:image/jpeg;base64," + lastScreenData.img_enhanced;
+                if (rightTag) rightTag.innerText = label.toUpperCase();
+            }
+
+            // Update active quad highlighting
+            document.querySelectorAll('.quad-card-flat').forEach(card => {
+                card.classList.remove('active-quad');
+            });
+            const activeCard = Array.from(document.querySelectorAll('.quad-card-flat')).find(c => 
+                c.getAttribute('onclick') && c.getAttribute('onclick').includes(`'${type}'`)
+            );
+            if (activeCard) activeCard.classList.add('active-quad');
 
             logModuleView(type);
             showToast("Comparison Mode: Raw vs " + label);
         }
 
         const splitSlider = document.getElementById('splitSlider');
-        const splitOverlay = document.getElementById('splitOverlay');
-        const splitHandle = document.getElementById('splitHandle');
         let isDragging = false;
 
         function setSplitPos(clientX) {
+            if (!splitSlider) return;
             const rect = splitSlider.getBoundingClientRect();
             let x = clientX - rect.left;
             x = Math.max(0, Math.min(x, rect.width));
-            const pct = (x / rect.width) * 100;
-            splitOverlay.style.width = pct + '%';
-            splitHandle.style.left = pct + '%';
+            const pct = ((x / rect.width) * 100).toFixed(2);
+            splitSlider.style.setProperty('--split-pct', pct + '%');
         }
 
-        splitSlider.addEventListener('mousedown', (e) => { isDragging = true; setSplitPos(e.clientX); });
-        window.addEventListener('mouseup', () => { isDragging = false; });
-        window.addEventListener('mousemove', (e) => { if (isDragging) setSplitPos(e.clientX); });
-        splitSlider.addEventListener('touchstart', (e) => { isDragging = true; setSplitPos(e.touches[0].clientX); });
-        window.addEventListener('touchend', () => { isDragging = false; });
-        window.addEventListener('touchmove', (e) => { if (isDragging) setSplitPos(e.touches[0].clientX); });
+        if (splitSlider) {
+            splitSlider.addEventListener('mousedown', (e) => { 
+                isDragging = true; 
+                setSplitPos(e.clientX); 
+            });
+            window.addEventListener('mouseup', () => { isDragging = false; });
+            window.addEventListener('mousemove', (e) => { 
+                if (isDragging) setSplitPos(e.clientX); 
+            });
+            splitSlider.addEventListener('touchstart', (e) => { 
+                isDragging = true; 
+                setSplitPos(e.touches[0].clientX); 
+            }, { passive: true });
+            window.addEventListener('touchend', () => { isDragging = false; });
+            window.addEventListener('touchmove', (e) => { 
+                if (isDragging) setSplitPos(e.touches[0].clientX); 
+            }, { passive: true });
+        }
 
         // Pitch Modal
         function openPitchModal(slideIdx=0) {
