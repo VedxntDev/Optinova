@@ -364,6 +364,56 @@ HTML_TEMPLATE = """
             border-color: var(--accent-gold-bright);
         }
 
+        /* Theme Toggle Icon Button */
+        .btn-theme-toggle {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 0;
+        }
+
+        .btn-theme-toggle:hover {
+            background: var(--bg-surface-elevated);
+            border-color: var(--accent-gold);
+            color: var(--accent-gold-bright);
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+        }
+
+        .btn-theme-toggle svg {
+            display: block;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .btn-theme-toggle:hover svg {
+            transform: rotate(20deg) scale(1.12);
+        }
+
+        [data-theme="light"] .theme-icon-sun {
+            display: none !important;
+        }
+
+        [data-theme="light"] .theme-icon-moon {
+            display: block !important;
+            color: #1e293b;
+        }
+
+        :root:not([data-theme="light"]) .theme-icon-sun {
+            display: block !important;
+            color: var(--accent-gold-bright);
+        }
+
+        :root:not([data-theme="light"]) .theme-icon-moon {
+            display: none !important;
+        }
+
         .container {
             max-width: 1280px;
             margin: 0 auto;
@@ -1622,8 +1672,21 @@ HTML_TEMPLATE = """
 
         <div class="nav-actions">
             <button class="btn-sharp" onclick="openPitchModal(0)">[ 📑 Presentation Deck ]</button>
-            <button class="btn-sharp" id="themeToggle" onclick="toggleTheme()">
-                <span id="themeLabel">THEME: DARK</span>
+            <button class="btn-theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Theme (Dark / Light)" aria-label="Toggle Theme">
+                <svg class="theme-icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg class="theme-icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
             </button>
             <a href="#screening" class="btn-sharp btn-sharp-primary">Initialize Scan</a>
         </div>
@@ -2551,13 +2614,11 @@ HTML_TEMPLATE = """
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             html.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            document.getElementById('themeLabel').innerText = "THEME: " + newTheme.toUpperCase();
         }
 
         (function() {
             const savedTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
-            document.getElementById('themeLabel').innerText = "THEME: " + savedTheme.toUpperCase();
         })();
 
         // File Selection Handlers with Instant Image Preview
