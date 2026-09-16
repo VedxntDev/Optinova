@@ -58,10 +58,11 @@ HTML_TEMPLATE = """
     <title>OPTINOVA AI — Retinal Intelligence & Clinical DR Screening</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Bebas+Neue&family=Oswald:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --font-display: 'Space Grotesk', -apple-system, sans-serif;
+            --font-condensed: 'Galgo Condensed', 'Barlow Condensed', 'Bebas Neue', 'Oswald', -apple-system, sans-serif;
+            --font-display: 'Galgo Condensed', 'Barlow Condensed', 'Space Grotesk', -apple-system, sans-serif;
             --font-main: 'Inter', -apple-system, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
 
@@ -304,12 +305,12 @@ HTML_TEMPLATE = """
         }
 
         .hero-title {
-            font-family: var(--font-display);
-            font-size: clamp(38px, 5.2vw, 68px);
-            font-weight: 700;
-            line-height: 1.05;
-            letter-spacing: -0.04em;
-            max-width: 980px;
+            font-family: var(--font-condensed);
+            font-size: clamp(48px, 6.8vw, 84px);
+            font-weight: 800;
+            line-height: 0.96;
+            letter-spacing: 0.01em;
+            max-width: 1040px;
             margin-bottom: 24px;
             text-transform: uppercase;
         }
@@ -365,10 +366,10 @@ HTML_TEMPLATE = """
             align-items: center;
             gap: 16px;
             padding-right: 16px;
-            font-family: var(--font-display);
-            font-size: clamp(20px, 3.2vw, 38px);
+            font-family: var(--font-condensed);
+            font-size: clamp(26px, 4.2vw, 48px);
             font-weight: 800;
-            letter-spacing: -0.03em;
+            letter-spacing: 0.02em;
             text-transform: uppercase;
             color: var(--text-primary);
             flex-shrink: 0;
@@ -455,12 +456,13 @@ HTML_TEMPLATE = """
         }
 
         .section-header-title {
-            font-family: var(--font-display);
-            font-size: 32px;
+            font-family: var(--font-condensed);
+            font-size: clamp(28px, 3.8vw, 42px);
             font-weight: 700;
-            letter-spacing: -0.03em;
+            letter-spacing: 0.01em;
             text-transform: uppercase;
             color: var(--text-primary);
+            line-height: 1.1;
         }
 
         .section-header-desc {
