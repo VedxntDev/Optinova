@@ -56,6 +56,7 @@ HTML_TEMPLATE = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OPTINOVA AI — Retinal Intelligence & Clinical DR Screening</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='12' r='3.5' fill='%23f59e0b'/%3E%3Ccircle cx='13.2' cy='10.8' r='1' fill='%23ffffff'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Bebas+Neue&family=Oswald:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -166,17 +167,33 @@ HTML_TEMPLATE = """
         }
 
         .nav-brand-mark {
-            width: 28px;
-            height: 28px;
-            background: var(--text-primary);
-            color: var(--bg-body);
+            width: 32px;
+            height: 32px;
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: var(--font-display);
-            font-weight: 700;
-            font-size: 14px;
-            letter-spacing: -0.5px;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .nav-brand:hover .nav-brand-mark {
+            border-color: var(--accent-gold);
+            background: var(--bg-surface);
+            color: var(--accent-gold-bright);
+        }
+
+        .nav-brand-mark svg {
+            display: block;
+            color: var(--text-primary);
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .nav-brand:hover .nav-brand-mark svg {
+            color: var(--accent-gold-bright);
+            transform: scale(1.08);
         }
 
         .nav-brand-text {
@@ -974,7 +991,13 @@ HTML_TEMPLATE = """
     <!-- Navigation Header -->
     <nav class="no-print">
         <a href="#" class="nav-brand">
-            <div class="nav-brand-mark">O</div>
+            <div class="nav-brand-mark">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="12" r="3.6" fill="var(--accent-gold)" stroke="currentColor" stroke-width="1.4"/>
+                    <circle cx="13.2" cy="10.8" r="1.1" fill="#ffffff"/>
+                </svg>
+            </div>
             <div class="nav-brand-text">
                 OPTINOVA <span class="nav-brand-sub">SIH26038</span>
             </div>
