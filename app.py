@@ -1237,14 +1237,14 @@ HTML_TEMPLATE = """
         }
 
         .preset-item-flat {
-            padding: 9px 12px;
+            padding: 10px 14px;
             border: 1px solid var(--border-color);
             background: var(--bg-surface);
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
             cursor: pointer;
-            border-left: 3.5px solid transparent;
+            border-left: 4px solid transparent;
             transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
             position: relative;
         }
@@ -1280,35 +1280,11 @@ HTML_TEMPLATE = """
         .preset-g4 { border-left-color: var(--accent-rose); }
         .preset-qc { border-left-color: #94a3b8; }
 
-        .preset-thumb-box {
-            width: 42px;
-            height: 42px;
-            background: #000000;
-            border: 1px solid var(--border-color);
-            flex-shrink: 0;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .preset-thumb-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.2s ease;
-        }
-
-        .preset-item-flat:hover .preset-thumb-img {
-            transform: scale(1.1);
-        }
-
         .preset-grade-badge {
             font-family: var(--font-mono);
-            font-size: 9px;
+            font-size: 9.5px;
             font-weight: 800;
-            padding: 1px 4px;
+            padding: 1.5px 5px;
             border: 1px solid currentColor;
             letter-spacing: 0.02em;
         }
@@ -2480,12 +2456,9 @@ HTML_TEMPLATE = """
                             <!-- Grade 0 -->
                             <div class="preset-item-flat preset-g0 cat-icdr" id="preset-sample_01_clear.png" onclick="selectSample('sample_01_clear.png')">
                                 <div class="preset-match-badge" id="match-sample_01_clear.png">● AI MATCH</div>
-                                <div class="preset-thumb-box">
-                                    <img class="preset-thumb-img" src="/sample_image/sample_01_clear.png" alt="G0" onerror="this.style.display='none'">
-                                </div>
                                 <div class="preset-info">
                                     <div class="preset-header-row">
-                                        <div style="display:flex; align-items:center; gap:5px;">
+                                        <div style="display:flex; align-items:center; gap:6px;">
                                             <span class="preset-grade-badge badge-g0">G0</span>
                                             <span class="preset-title">Grade 0: Normal Retina</span>
                                         </div>
@@ -2506,12 +2479,9 @@ HTML_TEMPLATE = """
                             <!-- Grade 1 -->
                             <div class="preset-item-flat preset-g1 cat-icdr" id="preset-sample_01b_mild_dr.png" onclick="selectSample('sample_01b_mild_dr.png')">
                                 <div class="preset-match-badge" id="match-sample_01b_mild_dr.png">● AI MATCH</div>
-                                <div class="preset-thumb-box">
-                                    <img class="preset-thumb-img" src="/sample_image/sample_01b_mild_dr.png" alt="G1" onerror="this.style.display='none'">
-                                </div>
                                 <div class="preset-info">
                                     <div class="preset-header-row">
-                                        <div style="display:flex; align-items:center; gap:5px;">
+                                        <div style="display:flex; align-items:center; gap:6px;">
                                             <span class="preset-grade-badge badge-g1">G1</span>
                                             <span class="preset-title">Grade 1: Mild NPDR</span>
                                         </div>
@@ -2532,12 +2502,9 @@ HTML_TEMPLATE = """
                             <!-- Grade 2 -->
                             <div class="preset-item-flat preset-g2 cat-icdr" id="preset-sample_06_moderate_dr.png" onclick="selectSample('sample_06_moderate_dr.png')">
                                 <div class="preset-match-badge" id="match-sample_06_moderate_dr.png">● AI MATCH</div>
-                                <div class="preset-thumb-box">
-                                    <img class="preset-thumb-img" src="/sample_image/sample_06_moderate_dr.png" alt="G2" onerror="this.style.display='none'">
-                                </div>
                                 <div class="preset-info">
                                     <div class="preset-header-row">
-                                        <div style="display:flex; align-items:center; gap:5px;">
+                                        <div style="display:flex; align-items:center; gap:6px;">
                                             <span class="preset-grade-badge badge-g2">G2</span>
                                             <span class="preset-title">Grade 2: Moderate DR</span>
                                         </div>
@@ -2558,12 +2525,9 @@ HTML_TEMPLATE = """
                             <!-- Grade 3 -->
                             <div class="preset-item-flat preset-g3 cat-icdr" id="preset-sample_07_severe_dr.png" onclick="selectSample('sample_07_severe_dr.png')">
                                 <div class="preset-match-badge" id="match-sample_07_severe_dr.png">● AI MATCH</div>
-                                <div class="preset-thumb-box">
-                                    <img class="preset-thumb-img" src="/sample_image/sample_07_severe_dr.png" alt="G3" onerror="this.style.display='none'">
-                                </div>
                                 <div class="preset-info">
                                     <div class="preset-header-row">
-                                        <div style="display:flex; align-items:center; gap:5px;">
+                                        <div style="display:flex; align-items:center; gap:6px;">
                                             <span class="preset-grade-badge badge-g3">G3</span>
                                             <span class="preset-title">Grade 3: Severe DR</span>
                                         </div>
@@ -2584,12 +2548,9 @@ HTML_TEMPLATE = """
                             <!-- Grade 4 -->
                             <div class="preset-item-flat preset-g4 cat-icdr" id="preset-sample_08_proliferative_dr.png" onclick="selectSample('sample_08_proliferative_dr.png')">
                                 <div class="preset-match-badge" id="match-sample_08_proliferative_dr.png">● AI MATCH</div>
-                                <div class="preset-thumb-box">
-                                    <img class="preset-thumb-img" src="/sample_image/sample_08_proliferative_dr.png" alt="G4" onerror="this.style.display='none'">
-                                </div>
                                 <div class="preset-info">
                                     <div class="preset-header-row">
-                                        <div style="display:flex; align-items:center; gap:5px;">
+                                        <div style="display:flex; align-items:center; gap:6px;">
                                             <span class="preset-grade-badge badge-g4">G4</span>
                                             <span class="preset-title">Grade 4: Proliferative</span>
                                         </div>
@@ -2621,12 +2582,9 @@ HTML_TEMPLATE = """
                             <!-- Low Contrast -->
                             <div class="preset-item-flat preset-qc cat-qc" id="preset-sample_02_low_contrast.png" onclick="selectSample('sample_02_low_contrast.png')">
                                 <div class="preset-match-badge" id="match-sample_02_low_contrast.png">● AI MATCH</div>
-                                <div class="preset-thumb-box">
-                                    <img class="preset-thumb-img" src="/sample_image/sample_02_low_contrast.png" alt="QC Low Contrast" onerror="this.style.display='none'">
-                                </div>
                                 <div class="preset-info">
                                     <div class="preset-header-row">
-                                        <div style="display:flex; align-items:center; gap:5px;">
+                                        <div style="display:flex; align-items:center; gap:6px;">
                                             <span class="preset-grade-badge badge-qc">QC</span>
                                             <span class="preset-title">Low Contrast Scan</span>
                                         </div>
@@ -2640,12 +2598,9 @@ HTML_TEMPLATE = """
                             <!-- Blurry Scan -->
                             <div class="preset-item-flat preset-qc cat-qc" id="preset-sample_03_blurry.png" onclick="selectSample('sample_03_blurry.png')">
                                 <div class="preset-match-badge" id="match-sample_03_blurry.png">● AI MATCH</div>
-                                <div class="preset-thumb-box">
-                                    <img class="preset-thumb-img" src="/sample_image/sample_03_blurry.png" alt="QC Blurry" onerror="this.style.display='none'">
-                                </div>
                                 <div class="preset-info">
                                     <div class="preset-header-row">
-                                        <div style="display:flex; align-items:center; gap:5px;">
+                                        <div style="display:flex; align-items:center; gap:6px;">
                                             <span class="preset-grade-badge badge-qc">QC</span>
                                             <span class="preset-title">Blurry Scan</span>
                                         </div>
@@ -2659,12 +2614,9 @@ HTML_TEMPLATE = """
                             <!-- Incomplete FOV -->
                             <div class="preset-item-flat preset-qc cat-qc" id="preset-sample_05_cropped.png" onclick="selectSample('sample_05_cropped.png')">
                                 <div class="preset-match-badge" id="match-sample_05_cropped.png">● AI MATCH</div>
-                                <div class="preset-thumb-box">
-                                    <img class="preset-thumb-img" src="/sample_image/sample_05_cropped.png" alt="QC Cropped" onerror="this.style.display='none'">
-                                </div>
                                 <div class="preset-info">
                                     <div class="preset-header-row">
-                                        <div style="display:flex; align-items:center; gap:5px;">
+                                        <div style="display:flex; align-items:center; gap:6px;">
                                             <span class="preset-grade-badge badge-qc">QC</span>
                                             <span class="preset-title">Incomplete FOV</span>
                                         </div>
@@ -2678,12 +2630,9 @@ HTML_TEMPLATE = """
                             <!-- Dark Scan -->
                             <div class="preset-item-flat preset-qc cat-qc" id="preset-sample_04_dark.png" onclick="selectSample('sample_04_dark.png')">
                                 <div class="preset-match-badge" id="match-sample_04_dark.png">● AI MATCH</div>
-                                <div class="preset-thumb-box">
-                                    <img class="preset-thumb-img" src="/sample_image/sample_04_dark.png" alt="QC Dark" onerror="this.style.display='none'">
-                                </div>
                                 <div class="preset-info">
                                     <div class="preset-header-row">
-                                        <div style="display:flex; align-items:center; gap:5px;">
+                                        <div style="display:flex; align-items:center; gap:6px;">
                                             <span class="preset-grade-badge badge-qc">QC</span>
                                             <span class="preset-title">Underexposed Scan</span>
                                         </div>
