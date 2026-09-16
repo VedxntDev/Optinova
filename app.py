@@ -582,6 +582,71 @@ HTML_TEMPLATE = """
             margin-top: 6px;
         }
 
+        /* Framer Text Reveal on Scroll Component (https://framer.com/m/Text-Reveal-on-Scroll-iAEwo4.js@r5fIqIUYTgYRry5w2nRx) */
+        .text-reveal-section {
+            padding: 70px 0;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            position: relative;
+        }
+
+        .text-reveal-header-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .text-reveal-header-tag::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-gold);
+        }
+
+        .text-reveal-content {
+            font-family: var(--font-condensed);
+            font-size: clamp(30px, 4.4vw, 54px);
+            font-weight: 700;
+            line-height: 1.18;
+            letter-spacing: 0.01em;
+            text-transform: uppercase;
+            max-width: 1120px;
+            color: var(--text-muted);
+            text-wrap: balance;
+            word-spacing: 0.08em;
+        }
+
+        .text-reveal-item {
+            display: inline;
+            transition: color 0.12s linear, opacity 0.12s linear;
+            will-change: color, opacity;
+            opacity: 0.18;
+            color: var(--text-muted);
+        }
+
+        .text-reveal-item.revealed {
+            opacity: 1;
+            color: var(--text-primary);
+        }
+
+        .text-reveal-item.revealed.highlight-gold {
+            color: var(--accent-gold-bright);
+            text-shadow: 0 0 16px rgba(245, 158, 11, 0.35);
+        }
+
+        .text-reveal-item.revealed.highlight-emerald {
+            color: var(--accent-emerald);
+            text-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+        }
+
         .section-box {
             padding: 70px 0;
             border-bottom: 1px solid var(--border-color);
@@ -1625,6 +1690,18 @@ HTML_TEMPLATE = """
                     <div class="metric-cell-value">&lt; 30 sec</div>
                     <div class="metric-cell-label">Doctor Verification Turnaround</div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Clinical Vision & Mission (Framer Text Reveal on Scroll) -->
+    <section class="text-reveal-section no-print" id="manifesto">
+        <div class="container">
+            <div class="text-reveal-header-tag">
+                [ 00 / CLINICAL PROTOCOL MANIFESTO ] • EDGE AUTONOMY &amp; ACCOUNTABILITY
+            </div>
+            <div class="text-reveal-content" data-text-reveal="word">
+                Delivering deterministic <span class="reveal-gold">sub-40 millisecond</span> edge Laplacian image quality gating, continuous <span class="reveal-gold">five-tier ICDR grading</span> with <span class="reveal-emerald">&gt;90% referable sensitivity</span>, and transparent spatial <span class="reveal-gold">Grad-CAM explainability</span> for doctor verification across rural primary health centres with <span class="reveal-gold">zero mandatory cloud connectivity</span>.
             </div>
         </div>
     </section>
@@ -3145,6 +3222,125 @@ HTML_TEMPLATE = """
             } else {
                 initSpotlightTracker();
             }
+        })();
+
+        // Framer Text Reveal on Scroll Engine (https://framer.com/m/Text-Reveal-on-Scroll-iAEwo4.js@r5fIqIUYTgYRry5w2nRx)
+        (function initFramerTextReveal() {
+            const revealContainers = document.querySelectorAll('[data-text-reveal]');
+            if (!revealContainers.length) return;
+
+            const registeredElements = [];
+
+            revealContainers.forEach(container => {
+                const rawHTML = container.innerHTML;
+                
+                // Parse text and spans while preserving highlight marks
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = rawHTML;
+
+                const tokenSpans = [];
+                
+                function processNode(node, highlightType = null) {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const wordsAndSpaces = node.textContent.match(/([\S]+|\s+)/g) || [];
+                        wordsAndSpaces.forEach(token => {
+                            if (/^\s+$/.test(token)) {
+                                const spaceNode = document.createTextNode(token);
+                                tokenSpans.push({ isSpace: true, node: spaceNode });
+                            } else {
+                                const span = document.createElement('span');
+                                span.className = 'text-reveal-item';
+                                if (highlightType === 'gold') span.dataset.highlight = 'gold';
+                                if (highlightType === 'emerald') span.dataset.highlight = 'emerald';
+                                span.textContent = token;
+                                tokenSpans.push({ isSpace: false, element: span, highlight: highlightType });
+                            }
+                        });
+                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                        let childHighlight = highlightType;
+                        if (node.classList.contains('reveal-gold') || node.classList.contains('accent-text')) {
+                            childHighlight = 'gold';
+                        } else if (node.classList.contains('reveal-emerald')) {
+                            childHighlight = 'emerald';
+                        }
+                        node.childNodes.forEach(child => processNode(child, childHighlight));
+                    }
+                }
+
+                tempDiv.childNodes.forEach(child => processNode(child));
+
+                container.innerHTML = '';
+                const wordItems = [];
+                tokenSpans.forEach(item => {
+                    if (item.isSpace) {
+                        container.appendChild(item.node);
+                    } else {
+                        container.appendChild(item.element);
+                        wordItems.push(item);
+                    }
+                });
+
+                registeredElements.push({
+                    container,
+                    wordItems,
+                    currentProgress: 0,
+                    targetProgress: 0
+                });
+            });
+
+            function updateScrollProgress() {
+                const windowHeight = window.innerHeight;
+
+                registeredElements.forEach(item => {
+                    const rect = item.container.getBoundingClientRect();
+                    // Reveal from 88% viewport bottom to 38% top
+                    const start = windowHeight * 0.88;
+                    const end = windowHeight * 0.38;
+                    const rawProgress = (start - rect.top) / (start - end);
+                    item.targetProgress = Math.min(Math.max(rawProgress, 0), 1);
+                });
+            }
+
+            function animateReveal() {
+                registeredElements.forEach(item => {
+                    // Smooth spring/lerp interpolation (lerp factor 0.12)
+                    item.currentProgress += (item.targetProgress - item.currentProgress) * 0.12;
+
+                    const totalWords = item.wordItems.length;
+                    if (totalWords === 0) return;
+
+                    item.wordItems.forEach((wordObj, idx) => {
+                        const wordStart = idx / totalWords;
+                        const wordEnd = (idx + 1) / totalWords;
+                        const wordProgress = Math.min(Math.max((item.currentProgress - wordStart) / (wordEnd - wordStart), 0), 1);
+
+                        const el = wordObj.element;
+                        if (wordProgress > 0) {
+                            el.style.opacity = (0.18 + 0.82 * wordProgress).toFixed(3);
+                            if (wordProgress >= 0.5) {
+                                el.classList.add('revealed');
+                                if (wordObj.highlight === 'gold') {
+                                    el.classList.add('highlight-gold');
+                                } else if (wordObj.highlight === 'emerald') {
+                                    el.classList.add('highlight-emerald');
+                                }
+                            } else {
+                                el.classList.remove('revealed', 'highlight-gold', 'highlight-emerald');
+                            }
+                        } else {
+                            el.style.opacity = '0.18';
+                            el.classList.remove('revealed', 'highlight-gold', 'highlight-emerald');
+                        }
+                    });
+                });
+
+                requestAnimationFrame(animateReveal);
+            }
+
+            window.addEventListener('scroll', updateScrollProgress, { passive: true });
+            window.addEventListener('resize', updateScrollProgress, { passive: true });
+            updateScrollProgress();
+            requestAnimationFrame(animateReveal);
         })();
     </script>
 </body>
