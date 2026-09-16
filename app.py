@@ -577,16 +577,304 @@ HTML_TEMPLATE = """
 
         .drop-zone-flat {
             border: 1px dashed var(--border-color);
-            padding: 30px 16px;
+            padding: 20px 16px;
             text-align: center;
             background: var(--bg-surface-elevated);
             cursor: pointer;
             margin-bottom: 16px;
+            transition: border-color 0.2s ease, background 0.2s ease;
         }
 
         .drop-zone-flat:hover {
             border-color: var(--accent-gold);
             background: var(--bg-badge);
+        }
+
+        .drop-preview-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .drop-preview-thumb {
+            width: 52px;
+            height: 52px;
+            background: #000000;
+            border: 1px solid var(--accent-gold);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .drop-preview-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .drop-preview-name {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .drop-preview-meta {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--accent-gold);
+        }
+
+        .drop-preview-change-btn {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-muted);
+            text-decoration: underline;
+            margin-top: 2px;
+        }
+
+        /* Diagnostic Biometric Scanner Animation (@scanLoader) */
+        .scan-loader-panel {
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .scan-loader-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .scan-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.04em;
+        }
+
+        .scan-pulse-light {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-gold);
+            border-radius: 50% !important;
+            box-shadow: 0 0 10px var(--accent-gold-bright);
+            animation: pulseGlow 1.2s infinite ease-in-out;
+        }
+
+        .scan-telemetry-status {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent-gold-bright);
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 3px 8px;
+        }
+
+        .scan-scanner-container {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .scan-scanner-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scan-viewport {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            background: #020305;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scan-viewport img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0.9;
+        }
+
+        .scan-laser-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold-bright), #ffffff, var(--accent-gold-bright), transparent);
+            box-shadow: 0 0 16px 2px var(--accent-gold-bright);
+            animation: laserSweep 1.6s infinite ease-in-out alternate;
+            z-index: 10;
+        }
+
+        @keyframes laserSweep {
+            0% { top: 4%; }
+            100% { top: 96%; }
+        }
+
+        .scan-reticle-circle {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 1px dashed rgba(245, 158, 11, 0.6);
+            border-radius: 50% !important;
+            animation: reticleSpin 12s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes reticleSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .scan-reticle-crosshair-x {
+            position: absolute;
+            top: 50%;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: rgba(245, 158, 11, 0.3);
+            pointer-events: none;
+        }
+
+        .scan-reticle-crosshair-y {
+            position: absolute;
+            left: 50%;
+            top: 15%;
+            bottom: 15%;
+            width: 1px;
+            background: rgba(245, 158, 11, 0.3);
+            pointer-events: none;
+        }
+
+        .scan-pipeline-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .scan-step-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            transition: all 0.2s ease;
+        }
+
+        .scan-step-row.step-active {
+            border-color: var(--accent-gold);
+            background: rgba(245, 158, 11, 0.06);
+        }
+
+        .scan-step-row.step-done {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .step-num {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-right: 10px;
+        }
+
+        .step-desc {
+            flex: 1;
+        }
+
+        .step-name {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .step-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .step-status-icon {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step-status-icon.status-pending {
+            color: var(--text-muted);
+            animation: spinPending 1.5s linear infinite;
+        }
+
+        @keyframes spinPending {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .step-status-icon.status-done {
+            color: var(--accent-emerald);
+            font-weight: 800;
+        }
+
+        .scan-progress-wrapper {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .scan-progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-bright));
+            transition: width 0.25s ease-out;
+        }
+
+        .scan-terminal-log {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 10px 14px;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: var(--accent-emerald);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .preset-list-flat {
@@ -1267,10 +1555,20 @@ HTML_TEMPLATE = """
                     </div>
 
                     <div class="drop-zone-flat" id="dropZone" onclick="document.getElementById('fileInput').click()">
-                        <div style="font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--text-primary); text-transform:uppercase;">
-                            [ Click or Drop Image ]
+                        <div id="dropZonePrompt">
+                            <div style="font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--text-primary); text-transform:uppercase;">
+                                [ Click or Drop Image ]
+                            </div>
+                            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Supports PNG, JPG, or DICOM</div>
                         </div>
-                        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Supports PNG, JPG, or DICOM</div>
+                        <div id="dropZonePreview" class="drop-preview-container" style="display:none;">
+                            <img id="dropZoneThumbImg" class="drop-preview-thumb" src="" alt="Selected Fundus">
+                            <div class="drop-preview-info">
+                                <div class="drop-preview-name" id="dropZoneFileName">image.png</div>
+                                <div class="drop-preview-meta" id="dropZoneFileMeta">RAW FUNDUS ACQUISITION</div>
+                                <div class="drop-preview-change-btn">[ Click to Change Image ]</div>
+                            </div>
+                        </div>
                         <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
                     </div>
 
@@ -1368,15 +1666,87 @@ HTML_TEMPLATE = """
                         <span style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted);">INT8 QUANTIZED</span>
                     </div>
 
-                    <div id="emptyPlaceholder" style="padding:60px 20px; text-align:center; border:1px dashed var(--border-color);">
-                        <div style="font-family:var(--font-mono); font-size:12px; color:var(--text-muted); text-transform:uppercase;">
-                            [ Awaiting Fundus Input — Select preset or upload image ]
+                    <div id="emptyPlaceholder" style="padding:48px 20px; text-align:center; border:1px dashed var(--border-color); background:var(--bg-surface);">
+                        <div id="emptyPlaceholderContent">
+                            <div style="font-family:var(--font-mono); font-size:12px; color:var(--text-muted); text-transform:uppercase;">
+                                [ Awaiting Fundus Input — Select preset or upload image ]
+                            </div>
+                        </div>
+                        <div id="emptyPlaceholderPreview" style="display:none; flex-direction:column; align-items:center; gap:16px;">
+                            <div style="position:relative; max-width:320px; width:100%; height:260px; background:#000000; border:1px solid var(--border-color); overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                                <img id="emptyPreviewImg" src="" alt="Selected Fundus Scan" style="width:100%; height:100%; object-fit:contain;">
+                                <div style="position:absolute; top:8px; left:8px; font-family:var(--font-mono); font-size:10px; background:rgba(0,0,0,0.75); color:var(--accent-gold); padding:2px 6px; border:1px solid var(--border-color);">FEED: STAGED</div>
+                            </div>
+                            <div style="font-family:var(--font-mono); font-size:12px; color:var(--text-primary);" id="emptyPreviewLabel">Fundus Image Staged</div>
+                            <button class="btn-sharp btn-sharp-primary" onclick="runScreening()">⚡ Execute AI Pipeline Now</button>
                         </div>
                     </div>
 
-                    <div id="scanLoader" style="display:none; padding:60px 20px; text-align:center; font-family:var(--font-mono);">
-                        <div style="font-size:14px; font-weight:700; color:var(--accent-gold);">EXECUTING MULTI-MODULE PIPELINE...</div>
-                        <div style="font-size:12px; color:var(--text-muted); margin-top:6px;">Laplacian QC → CIELAB CLAHE → Frangi Vessel → Youden-J Grading → Grad-CAM</div>
+                    <!-- Animated Biometric Retinal Scanner View -->
+                    <div id="scanLoader" class="scan-loader-panel" style="display:none;">
+                        <div class="scan-loader-header">
+                            <div class="scan-title">
+                                <span class="scan-pulse-light"></span>
+                                <span>EDGE DIAGNOSTIC PIPELINE ACTIVE</span>
+                            </div>
+                            <div class="scan-telemetry-status" id="scanLiveStatus">MODULE 1 / 4: EDGE DSP QC</div>
+                        </div>
+
+                        <div class="scan-scanner-container">
+                            <div class="scan-viewport">
+                                <img id="scanPreviewImg" src="" alt="Active Scan Input">
+                                <div class="scan-laser-line"></div>
+                                <div class="scan-reticle-crosshair-x"></div>
+                                <div class="scan-reticle-crosshair-y"></div>
+                                <div class="scan-reticle-circle"></div>
+                            </div>
+
+                            <div class="scan-pipeline-steps">
+                                <div class="scan-step-row" id="stepMod1">
+                                    <div class="step-num">01</div>
+                                    <div class="step-desc">
+                                        <div class="step-name">Laplacian Edge Sharpness &amp; CIELAB CLAHE</div>
+                                        <div class="step-sub">Filter blur (Var &gt; τ) &amp; normalize illumination (&lt;40 ms)</div>
+                                    </div>
+                                    <div class="step-status-icon status-pending" id="iconMod1">⟳</div>
+                                </div>
+
+                                <div class="scan-step-row" id="stepMod2">
+                                    <div class="step-num">02</div>
+                                    <div class="step-desc">
+                                        <div class="step-name">Frangi Vessel &amp; Top-Hat Lesion Extraction</div>
+                                        <div class="step-sub">Isolate microaneurysms, blot hemorrhages, exudates</div>
+                                    </div>
+                                    <div class="step-status-icon status-pending" id="iconMod2">⟳</div>
+                                </div>
+
+                                <div class="scan-step-row" id="stepMod3">
+                                    <div class="step-num">03</div>
+                                    <div class="step-desc">
+                                        <div class="step-name">Continuous 5-Tier ICDR Severity Grading</div>
+                                        <div class="step-sub">Cost-sensitive calibration (&gt;90% sensitivity on Grade ≥2)</div>
+                                    </div>
+                                    <div class="step-status-icon status-pending" id="iconMod3">⟳</div>
+                                </div>
+
+                                <div class="scan-step-row" id="stepMod4">
+                                    <div class="step-num">04</div>
+                                    <div class="step-desc">
+                                        <div class="step-name">Grad-CAM XAI &amp; Spatial IoU Reliability Gate</div>
+                                        <div class="step-sub">Spatial overlap IoU ≥ 0.45 verification for doctor review</div>
+                                    </div>
+                                    <div class="step-status-icon status-pending" id="iconMod4">⟳</div>
+                                </div>
+
+                                <div class="scan-progress-wrapper">
+                                    <div class="scan-progress-bar" id="scanProgressBar"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="scan-terminal-log" id="scanTerminalLog">
+                            &gt; INITIALIZING EDGE HARDWARE DSP CONVOLUTION ENGINE...
+                        </div>
                     </div>
 
                     <!-- Results View -->
@@ -1884,7 +2254,32 @@ HTML_TEMPLATE = """
             document.getElementById('themeLabel').innerText = "THEME: " + savedTheme.toUpperCase();
         })();
 
-        // File Selection Handlers
+        // File Selection Handlers with Instant Image Preview
+        function updateSelectedPreview(src, name, meta) {
+            const dropPrompt = document.getElementById('dropZonePrompt');
+            const dropPreview = document.getElementById('dropZonePreview');
+            const thumbImg = document.getElementById('dropZoneThumbImg');
+            const fileName = document.getElementById('dropZoneFileName');
+            const fileMeta = document.getElementById('dropZoneFileMeta');
+            const scanPreview = document.getElementById('scanPreviewImg');
+            const emptyContent = document.getElementById('emptyPlaceholderContent');
+            const emptyPreview = document.getElementById('emptyPlaceholderPreview');
+            const emptyPreviewImg = document.getElementById('emptyPreviewImg');
+            const emptyPreviewLabel = document.getElementById('emptyPreviewLabel');
+
+            if (dropPrompt) dropPrompt.style.display = 'none';
+            if (dropPreview) dropPreview.style.display = 'flex';
+            if (thumbImg) thumbImg.src = src;
+            if (fileName) fileName.innerText = name;
+            if (fileMeta) fileMeta.innerText = meta;
+            if (scanPreview) scanPreview.src = src;
+
+            if (emptyContent) emptyContent.style.display = 'none';
+            if (emptyPreview) emptyPreview.style.display = 'flex';
+            if (emptyPreviewImg) emptyPreviewImg.src = src;
+            if (emptyPreviewLabel) emptyPreviewLabel.innerText = name;
+        }
+
         function handleFileSelect(event) {
             const files = event.target.files;
             if (files && files.length > 0) {
@@ -1893,6 +2288,13 @@ HTML_TEMPLATE = """
                 document.querySelectorAll('.preset-item-flat').forEach(el => el.classList.remove('active'));
                 document.getElementById('fileSelectionText').innerText = "[ SELECTED: " + selectedFile.name + " ]";
                 document.getElementById('btnRun').disabled = false;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const sizeKB = (selectedFile.size / 1024).toFixed(1);
+                    updateSelectedPreview(e.target.result, selectedFile.name, `LOCAL UPLOAD • ${sizeKB} KB`);
+                };
+                reader.readAsDataURL(selectedFile);
             }
         }
 
@@ -1910,6 +2312,80 @@ HTML_TEMPLATE = """
             runScreening();
         }
 
+        // Animated Multi-Stage Pipeline Runner
+        let animTimeouts = [];
+        function clearAnimTimeouts() {
+            animTimeouts.forEach(t => clearTimeout(t));
+            animTimeouts = [];
+        }
+
+        function startPipelineAnimation() {
+            clearAnimTimeouts();
+            const bar = document.getElementById('scanProgressBar');
+            const log = document.getElementById('scanTerminalLog');
+            const status = document.getElementById('scanLiveStatus');
+
+            // Reset all step states
+            for (let i = 1; i <= 4; i++) {
+                const row = document.getElementById('stepMod' + i);
+                const icon = document.getElementById('iconMod' + i);
+                if (row) row.className = 'scan-step-row';
+                if (icon) {
+                    icon.className = 'step-status-icon status-pending';
+                    icon.innerText = '⟳';
+                }
+            }
+
+            // Step 1: Module 1 Active
+            const step1 = document.getElementById('stepMod1');
+            if (step1) step1.classList.add('step-active');
+            if (bar) bar.style.width = '20%';
+            if (status) status.innerText = 'MODULE 1 / 4: EDGE DSP QC';
+            if (log) log.innerText = '> COMPUTING LAPLACIAN VARIANCE Var(∇²I) & FIELD OF VIEW...';
+
+            animTimeouts.push(setTimeout(() => {
+                // Step 1 Done, Step 2 Active
+                const s1 = document.getElementById('stepMod1');
+                const i1 = document.getElementById('iconMod1');
+                if (s1) { s1.classList.remove('step-active'); s1.classList.add('step-done'); }
+                if (i1) { i1.className = 'step-status-icon status-done'; i1.innerText = '✓'; }
+
+                const s2 = document.getElementById('stepMod2');
+                if (s2) s2.classList.add('step-active');
+                if (bar) bar.style.width = '48%';
+                if (status) status.innerText = 'MODULE 2 / 4: MORPHOLOGICAL SEGMENTATION';
+                if (log) log.innerText = '> EXTRACTING FRANGI EIGENVALUES & TOP-HAT LESION MASKS...';
+            }, 300));
+
+            animTimeouts.push(setTimeout(() => {
+                // Step 2 Done, Step 3 Active
+                const s2 = document.getElementById('stepMod2');
+                const i2 = document.getElementById('iconMod2');
+                if (s2) { s2.classList.remove('step-active'); s2.classList.add('step-done'); }
+                if (i2) { i2.className = 'step-status-icon status-done'; i2.innerText = '✓'; }
+
+                const s3 = document.getElementById('stepMod3');
+                if (s3) s3.classList.add('step-active');
+                if (bar) bar.style.width = '75%';
+                if (status) status.innerText = 'MODULE 3 / 4: 5-TIER ICDR GRADING';
+                if (log) log.innerText = '> EVALUATING YOUDEN-J SENSITIVITY CALIBRATION MATRIX...';
+            }, 650));
+
+            animTimeouts.push(setTimeout(() => {
+                // Step 3 Done, Step 4 Active
+                const s3 = document.getElementById('stepMod3');
+                const i3 = document.getElementById('iconMod3');
+                if (s3) { s3.classList.remove('step-active'); s3.classList.add('step-done'); }
+                if (i3) { i3.className = 'step-status-icon status-done'; i3.innerText = '✓'; }
+
+                const s4 = document.getElementById('stepMod4');
+                if (s4) s4.classList.add('step-active');
+                if (bar) bar.style.width = '92%';
+                if (status) status.innerText = 'MODULE 4 / 4: XAI RELIABILITY GATING';
+                if (log) log.innerText = '> PROJECTING GRAD-CAM & VALIDATING SPATIAL IOU ≥ 0.45...';
+            }, 1000));
+        }
+
         // Run Screening Pipeline
         function runScreening() {
             const emptyState = document.getElementById('emptyPlaceholder');
@@ -1919,6 +2395,8 @@ HTML_TEMPLATE = """
             emptyState.style.display = 'none';
             results.style.display = 'none';
             loader.style.display = 'block';
+
+            startPipelineAnimation();
 
             const formData = new FormData();
             if (selectedFile) formData.append('file', selectedFile);
@@ -1937,45 +2415,70 @@ HTML_TEMPLATE = """
             })
             .then(data => {
                 lastScreenData = data;
-                loader.style.display = 'none';
-                results.style.display = 'block';
 
-                document.getElementById('resGradeTitle').innerText = data.grade_name;
-                document.getElementById('resConfidence').innerText = `Confidence: ${(data.confidence * 100).toFixed(1)}% • Focus Sharpness: ${data.quality.focus_score.toFixed(1)} (τ)`;
-
-                const badge = document.getElementById('resUrgencyBadge');
-                if (data.status === 'reject') {
-                    badge.innerText = "GATEKEEPER REJECTED";
-                    badge.style.color = "var(--accent-rose)";
-                    badge.style.borderColor = "var(--accent-rose)";
-                } else if (data.referable) {
-                    badge.innerText = "REFERRAL REQUIRED";
-                    badge.style.color = "var(--accent-gold)";
-                    badge.style.borderColor = "var(--accent-gold)";
-                } else {
-                    badge.innerText = "ROUTINE / NORMAL";
-                    badge.style.color = "var(--accent-emerald)";
-                    badge.style.borderColor = "var(--accent-emerald)";
+                // Mark all steps done & complete progress
+                clearAnimTimeouts();
+                for (let i = 1; i <= 4; i++) {
+                    const s = document.getElementById('stepMod' + i);
+                    const ic = document.getElementById('iconMod' + i);
+                    if (s) { s.className = 'scan-step-row step-done'; }
+                    if (ic) { ic.className = 'step-status-icon status-done'; ic.innerText = '✓'; }
                 }
+                const bar = document.getElementById('scanProgressBar');
+                if (bar) bar.style.width = '100%';
 
-                document.getElementById('imgOrig').src = "data:image/jpeg;base64," + data.img_orig;
-                document.getElementById('imgEnhanced').src = "data:image/jpeg;base64," + data.img_enhanced;
-                document.getElementById('imgOverlay').src = "data:image/jpeg;base64," + data.img_overlay;
-                document.getElementById('imgGradcam').src = "data:image/jpeg;base64," + data.img_gradcam;
+                updateSelectedPreview(
+                    "data:image/jpeg;base64," + data.img_orig,
+                    selectedSampleName || (selectedFile ? selectedFile.name : "Fundus Scan"),
+                    `PROVENANCE: ${data.patient_id} • ${data.laterality}`
+                );
 
-                if (splitSlider) splitSlider.style.setProperty('--split-pct', '50%');
-                setSplitMode('enhanced', 'CLAHE');
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    results.style.display = 'block';
 
-                document.getElementById('bmMAs').innerText = data.stats.ma_count || 0;
-                document.getElementById('bmExudates').innerText = data.stats.exudate_count || 0;
-                document.getElementById('bmHems').innerText = data.stats.hem_count || 0;
-                document.getElementById('bmFocus').innerText = data.quality.focus_score.toFixed(1);
-                document.getElementById('bmCorrelation').innerText = data.correlation_score.toFixed(2);
-                document.getElementById('bmNV').innerText = data.stats.nv_flag ? "YES (Active)" : "None";
+                    document.getElementById('resGradeTitle').innerText = data.grade_name;
+                    document.getElementById('resConfidence').innerText = `Confidence: ${(data.confidence * 100).toFixed(1)}% • Focus Sharpness: ${data.quality.focus_score.toFixed(1)} (τ)`;
 
-                document.getElementById('resRationaleText').innerText = data.rationale;
+                    const badge = document.getElementById('resUrgencyBadge');
+                    if (data.status === 'reject') {
+                        badge.innerText = "GATEKEEPER REJECTED";
+                        badge.style.color = "var(--accent-rose)";
+                        badge.style.borderColor = "var(--accent-rose)";
+                    } else if (data.grade_level >= 2) {
+                        badge.innerText = "REFERRAL REQUIRED";
+                        badge.style.color = "var(--accent-rose)";
+                        badge.style.borderColor = "var(--accent-rose)";
+                    } else if (data.grade_level === 1) {
+                        badge.innerText = "MONITOR 12-MONTH";
+                        badge.style.color = "var(--accent-gold-bright)";
+                        badge.style.borderColor = "var(--accent-gold-bright)";
+                    } else {
+                        badge.innerText = "ROUTINE / NORMAL";
+                        badge.style.color = "var(--accent-emerald)";
+                        badge.style.borderColor = "var(--accent-emerald)";
+                    }
+
+                    document.getElementById('imgOrig').src = "data:image/jpeg;base64," + data.img_orig;
+                    document.getElementById('imgEnhanced').src = "data:image/jpeg;base64," + data.img_enhanced;
+                    document.getElementById('imgOverlay').src = "data:image/jpeg;base64," + data.img_overlay;
+                    document.getElementById('imgGradcam').src = "data:image/jpeg;base64," + data.img_gradcam;
+
+                    if (splitSlider) splitSlider.style.setProperty('--split-pct', '50%');
+                    setSplitMode('enhanced', 'CLAHE');
+
+                    document.getElementById('bmMAs').innerText = data.stats.ma_count || 0;
+                    document.getElementById('bmExudates').innerText = data.stats.exudate_count || 0;
+                    document.getElementById('bmHems').innerText = data.stats.hem_count || 0;
+                    document.getElementById('bmFocus').innerText = data.quality.focus_score.toFixed(1);
+                    document.getElementById('bmCorrelation').innerText = data.correlation_score.toFixed(2);
+                    document.getElementById('bmNV').innerText = data.stats.nv_flag ? "YES (Active)" : "None";
+
+                    document.getElementById('resRationaleText').innerText = data.rationale;
+                }, 400);
             })
             .catch(err => {
+                clearAnimTimeouts();
                 loader.style.display = 'none';
                 alert("Execution Error: " + err.message);
             });
