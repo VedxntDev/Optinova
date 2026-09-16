@@ -145,6 +145,17 @@ HTML_TEMPLATE = """
             z-index: 0;
         }
 
+        /* Framer Interactive Dots-1 Background (Dots-1 / Io2EJNUHmQKXYcZgVePZ) */
+        .framer-dots-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         /* Navigation */
         nav {
             position: sticky;
@@ -1334,6 +1345,7 @@ HTML_TEMPLATE = """
 </head>
 <body>
 
+    <canvas id="interactiveDotsCanvas" class="framer-dots-bg no-print"></canvas>
     <div class="technical-grid"></div>
 
     <!-- Navigation Header -->
@@ -2850,6 +2862,107 @@ HTML_TEMPLATE = """
             }
 
             requestAnimationFrame(animateVelocity);
+        })();
+
+        // Framer Interactive Dots-1 Background Engine (Dots-1 / Io2EJNUHmQKXYcZgVePZ)
+        (function initFramerDots() {
+            const canvas = document.getElementById('interactiveDotsCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            let dpr = window.devicePixelRatio || 1;
+
+            let mouseX = -1000;
+            let mouseY = -1000;
+            let targetMouseX = -1000;
+            let targetMouseY = -1000;
+
+            const SPACING = 48; // Grid spacing in px
+            const BASE_RADIUS = 1.5;
+            const PROXIMITY_RADIUS = 190;
+            const BASE_OPACITY = 0.14;
+            const MAX_OPACITY = 0.95;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                dpr = window.devicePixelRatio || 1;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            window.addEventListener('resize', resize, { passive: true });
+            resize();
+
+            window.addEventListener('mousemove', (e) => {
+                targetMouseX = e.clientX;
+                targetMouseY = e.clientY;
+            }, { passive: true });
+
+            window.addEventListener('mouseleave', () => {
+                targetMouseX = -1000;
+                targetMouseY = -1000;
+            });
+
+            function render() {
+                ctx.clearRect(0, 0, width, height);
+
+                // Smooth mouse interpolation
+                mouseX += (targetMouseX - mouseX) * 0.12;
+                mouseY += (targetMouseY - mouseY) * 0.12;
+
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const baseDotColor = isDark ? 'rgba(148, 163, 184, ' : 'rgba(100, 116, 139, ';
+                const glowR = 245, glowG = 158, glowB = 11; // Amber gold
+
+                const cols = Math.ceil(width / SPACING) + 1;
+                const rows = Math.ceil(height / SPACING) + 1;
+
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const x = c * SPACING;
+                        const y = r * SPACING;
+
+                        const dx = mouseX - x;
+                        const dy = mouseY - y;
+                        const dist = Math.hypot(dx, dy);
+
+                        let radius = BASE_RADIUS;
+                        let opacity = BASE_OPACITY;
+                        let fill = baseDotColor + BASE_OPACITY + ')';
+
+                        if (dist < PROXIMITY_RADIUS) {
+                            const factor = 1 - (dist / PROXIMITY_RADIUS);
+                            const easeFactor = factor * factor;
+                            opacity = BASE_OPACITY + (MAX_OPACITY - BASE_OPACITY) * easeFactor;
+                            radius = BASE_RADIUS + (3.4 - BASE_RADIUS) * easeFactor;
+                            fill = `rgba(${glowR}, ${glowG}, ${glowB}, ${opacity.toFixed(3)})`;
+
+                            // Faint optical laser crosshair connection under direct cursor proximity
+                            if (dist < 80 && factor > 0.45) {
+                                ctx.strokeStyle = `rgba(${glowR}, ${glowG}, ${glowB}, ${(0.22 * factor).toFixed(3)})`;
+                                ctx.lineWidth = 0.8;
+                                ctx.beginPath();
+                                ctx.moveTo(x, y);
+                                ctx.lineTo(mouseX, mouseY);
+                                ctx.stroke();
+                            }
+                        }
+
+                        ctx.beginPath();
+                        ctx.arc(x, y, radius, 0, Math.PI * 2);
+                        ctx.fillStyle = fill;
+                        ctx.fill();
+                    }
+                }
+
+                requestAnimationFrame(render);
+            }
+
+            requestAnimationFrame(render);
         })();
     </script>
 </body>
