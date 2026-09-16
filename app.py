@@ -310,8 +310,127 @@ HTML_TEMPLATE = """
 
         /* Hero */
         .hero {
+            position: relative;
             padding: 80px 0 50px 0;
             border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        /* Framer Hover Mask Effect (https://exquisite-road-005415.framer.app/) */
+        .hover-mask-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-hover-mask-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            background: 
+                radial-gradient(circle 380px at var(--mask-x, -1000px) var(--mask-y, -1000px), rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.04) 40%, transparent 80%),
+                linear-gradient(to right, rgba(245, 158, 11, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(245, 158, 11, 0.08) 1px, transparent 1px);
+            background-size: 100% 100%, 32px 32px, 32px 32px;
+            -webkit-mask-image: radial-gradient(circle 280px at var(--mask-x, -1000px) var(--mask-y, -1000px), black 20%, rgba(0,0,0,0.6) 55%, transparent 100%);
+            mask-image: radial-gradient(circle 280px at var(--mask-x, -1000px) var(--mask-y, -1000px), black 20%, rgba(0,0,0,0.6) 55%, transparent 100%);
+        }
+
+        .hero:hover .hero-hover-mask-layer {
+            opacity: 1;
+        }
+
+        .hero-hover-reticle {
+            position: absolute;
+            top: var(--mask-y, -1000px);
+            left: var(--mask-x, -1000px);
+            width: 170px;
+            height: 170px;
+            transform: translate(-50%, -50%);
+            border: 1px dashed rgba(245, 158, 11, 0.55);
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.22);
+            animation: maskReticleSpin 22s linear infinite;
+        }
+
+        .hero-hover-reticle-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 64px;
+            height: 64px;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(245, 158, 11, 0.75);
+            border-radius: 50%;
+        }
+
+        .hero-hover-reticle-inner::before,
+        .hero-hover-reticle-inner::after {
+            content: '';
+            position: absolute;
+            background: rgba(245, 158, 11, 0.85);
+        }
+
+        .hero-hover-reticle-inner::before {
+            top: 50%; left: -10px; right: -10px; height: 1px; transform: translateY(-50%);
+        }
+
+        .hero-hover-reticle-inner::after {
+            left: 50%; top: -10px; bottom: -10px; width: 1px; transform: translateX(-50%);
+        }
+
+        @keyframes maskReticleSpin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Interactive Spotlight Cards (Radial Border & Surface Glow) */
+        .spotlight-card {
+            position: relative;
+            background: var(--bg-surface);
+            overflow: hidden;
+        }
+
+        .spotlight-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(350px circle at var(--mouse-x, -1000px) var(--mouse-y, -1000px), rgba(245, 158, 11, 0.16), transparent 80%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .spotlight-card:hover::before {
+            opacity: 1;
+        }
+
+        .spotlight-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 1px solid transparent;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            background: radial-gradient(280px circle at var(--mouse-x, -1000px) var(--mouse-y, -1000px), rgba(245, 158, 11, 0.65), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .spotlight-card:hover::after {
+            opacity: 1;
+        }
+
+        .spotlight-card > * {
+            position: relative;
+            z-index: 3;
         }
 
         .hero-meta-bar {
@@ -1379,8 +1498,14 @@ HTML_TEMPLATE = """
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero no-print">
+    <!-- Hero Section with Framer Hover Mask -->
+    <section class="hero hover-mask-container no-print">
+        <div class="hero-hover-mask-layer" aria-hidden="true">
+            <div class="hero-hover-reticle">
+                <div class="hero-hover-reticle-inner"></div>
+            </div>
+        </div>
+
         <div class="container">
             <div class="hero-meta-bar">
                 <span>SMART INDIA HACKATHON 2026</span>
@@ -1484,19 +1609,19 @@ HTML_TEMPLATE = """
 
             <!-- Telemetry Metrics Bar -->
             <div class="metrics-grid-flat">
-                <div class="metric-cell">
+                <div class="metric-cell spotlight-card">
                     <div class="metric-cell-value">&lt; 40 ms</div>
                     <div class="metric-cell-label">Edge Laplacian QC Gate</div>
                 </div>
-                <div class="metric-cell">
+                <div class="metric-cell spotlight-card">
                     <div class="metric-cell-value">&gt; 90%</div>
                     <div class="metric-cell-label">Referable Sensitivity (Grade ≥2)</div>
                 </div>
-                <div class="metric-cell">
+                <div class="metric-cell spotlight-card">
                     <div class="metric-cell-value">136,875</div>
                     <div class="metric-cell-label">Annual Hub Patient Volume</div>
                 </div>
-                <div class="metric-cell">
+                <div class="metric-cell spotlight-card">
                     <div class="metric-cell-value">&lt; 30 sec</div>
                     <div class="metric-cell-label">Doctor Verification Turnaround</div>
                 </div>
@@ -1514,7 +1639,7 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="arch-grid">
-                <div class="arch-card">
+                <div class="arch-card spotlight-card">
                     <span class="arch-card-num">MOD 01</span>
                     <h3 class="arch-card-title">Edge DSP & QC</h3>
                     <p class="arch-card-text">
@@ -1522,7 +1647,7 @@ HTML_TEMPLATE = """
                     </p>
                 </div>
 
-                <div class="arch-card">
+                <div class="arch-card spotlight-card">
                     <span class="arch-card-num">MOD 02</span>
                     <h3 class="arch-card-title">Vessel & Lesions</h3>
                     <p class="arch-card-text">
@@ -1530,7 +1655,7 @@ HTML_TEMPLATE = """
                     </p>
                 </div>
 
-                <div class="arch-card">
+                <div class="arch-card spotlight-card">
                     <span class="arch-card-num">MOD 03</span>
                     <h3 class="arch-card-title">Calibrated Grading</h3>
                     <p class="arch-card-text">
@@ -1538,7 +1663,7 @@ HTML_TEMPLATE = """
                     </p>
                 </div>
 
-                <div class="arch-card">
+                <div class="arch-card spotlight-card">
                     <span class="arch-card-num">MOD 04</span>
                     <h3 class="arch-card-title">XAI & Telemetry</h3>
                     <p class="arch-card-text">
@@ -1560,7 +1685,7 @@ HTML_TEMPLATE = """
 
             <div class="studio-grid-flat">
                 <!-- Control Panel -->
-                <div class="studio-control-panel">
+                <div class="studio-control-panel spotlight-card">
                     <div class="panel-title-flat">
                         <span>Fundus Acquisition</span>
                         <span style="font-family:var(--font-mono); font-size:10px; color:var(--accent-gold);">UVC / V4L2</span>
@@ -1672,7 +1797,7 @@ HTML_TEMPLATE = """
                 </div>
 
                 <!-- Results Output Panel -->
-                <div class="studio-display-panel">
+                <div class="studio-display-panel spotlight-card">
                     <div class="panel-title-flat">
                         <span>Diagnostic Telemetry & Explainability</span>
                         <span style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted);">INT8 QUANTIZED</span>
@@ -2963,6 +3088,63 @@ HTML_TEMPLATE = """
             }
 
             requestAnimationFrame(render);
+        })();
+
+        // Framer Hover Mask Effect Engine (https://exquisite-road-005415.framer.app/)
+        (function initFramerHoverMask() {
+            const hero = document.querySelector('.hero');
+            let heroMaskX = -1000, heroMaskY = -1000;
+            let targetHeroMaskX = -1000, targetHeroMaskY = -1000;
+
+            if (hero) {
+                hero.addEventListener('mousemove', (e) => {
+                    const rect = hero.getBoundingClientRect();
+                    targetHeroMaskX = e.clientX - rect.left;
+                    targetHeroMaskY = e.clientY - rect.top;
+                });
+
+                hero.addEventListener('mouseleave', () => {
+                    targetHeroMaskX = -1000;
+                    targetHeroMaskY = -1000;
+                });
+
+                function animateHeroMask() {
+                    // Smooth followDelay / lerp inertia (lerp factor 0.10)
+                    heroMaskX += (targetHeroMaskX - heroMaskX) * 0.10;
+                    heroMaskY += (targetHeroMaskY - heroMaskY) * 0.10;
+
+                    hero.style.setProperty('--mask-x', `${heroMaskX.toFixed(2)}px`);
+                    hero.style.setProperty('--mask-y', `${heroMaskY.toFixed(2)}px`);
+
+                    requestAnimationFrame(animateHeroMask);
+                }
+                requestAnimationFrame(animateHeroMask);
+            }
+
+            // Spotlight card mouse coordinate tracker
+            function initSpotlightTracker() {
+                const spotlightCards = document.querySelectorAll('.spotlight-card, .telemetry-item-flat');
+                spotlightCards.forEach(card => {
+                    card.addEventListener('mousemove', (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        card.style.setProperty('--mouse-x', `${x}px`);
+                        card.style.setProperty('--mouse-y', `${y}px`);
+                    }, { passive: true });
+
+                    card.addEventListener('mouseleave', () => {
+                        card.style.setProperty('--mouse-x', `-1000px`);
+                        card.style.setProperty('--mouse-y', `-1000px`);
+                    });
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSpotlightTracker);
+            } else {
+                initSpotlightTracker();
+            }
         })();
     </script>
 </body>
